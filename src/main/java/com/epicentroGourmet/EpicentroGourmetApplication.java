@@ -7,5 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class EpicentroGourmetApplication {
     public static void main(String[] args) {
         SpringApplication.run(EpicentroGourmetApplication.class, args);
+            System.out.println("hola");
+
     }
 }
