@@ -2,19 +2,10 @@ package com.epicentroGourmet.entities;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +15,12 @@ import lombok.Setter;
 @Table(name="user_role", uniqueConstraints=@UniqueConstraint(columnNames= {"role", "user_id"}))
 public class UserRole {
 
+	public enum RolEnum{
+		ROLE_ADMIN,
+		ROLE_RESPONSABLE,
+		ROLE_EMPLEADO
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idUserRole;
@@ -31,9 +28,9 @@ public class UserRole {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id", nullable=false)
 	private User user;
-
+	@Enumerated(EnumType.STRING)
 	@Column(name="role", nullable=false, length=100)
-	private String role;
+	private RolEnum role;
 
 	@CreationTimestamp
 	private LocalDateTime createdAt;
@@ -41,7 +38,7 @@ public class UserRole {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	public UserRole(int id, User user, String role) {
+	public UserRole(int id, User user, RolEnum role) {
 		this.idUserRole = id;
 		this.user = user;
 		this.role = role;

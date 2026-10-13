@@ -33,8 +33,17 @@ public class SecurityConfiguration {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(auth -> {
+					// Recursos estáticos públicos
 					auth.requestMatchers("/css/*", "/imgs/*", "/js/*", "/vendor/bootstrap/css/*",
-							"/vendor/jquery/*", "/vendor/bootstrap/js/*", "/api/v1/**").permitAll();
+							"/vendor/jquery/*", "/vendor/bootstrap/js/*").permitAll();
+
+					auth.requestMatchers("/", "/index", "/login", "/logout", "/loginsuccess").permitAll();
+
+					// Restricciones por Rol
+					auth.requestMatchers("/admin/**").hasRole("ADMIN");
+					auth.requestMatchers("/responsable/**").hasRole("RESPONSABLE");
+					auth.requestMatchers("/empleado/**").hasRole("EMPLEADO");
+
 					auth.anyRequest().authenticated();
 				})
 				.formLogin(login -> {
