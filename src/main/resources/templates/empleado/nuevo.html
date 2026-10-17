@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Empleados</h1>
+
+        <a class="btn btn-success"
+           th:href="@{/responsable/empleados/nuevo}">
+            Agregar empleado
+        </a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>DNI</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="empleado : ${empleados}">
+            <td th:text="${empleado.nombre}"></td>
+            <td th:text="${empleado.apellido}"></td>
+            <td th:text="${empleado.dni}"></td>
+
+            <!-- El tipo se puede mejorar luego con DTO -->
+            <td th:text="${empleado.getClass().simpleName}"></td>
+
+            <td>
+                <a class="btn btn-warning btn-sm"
+                   th:href="@{/responsable/empleados/editar/{id}(id=${empleado.idEmpleado})}">
+                    Editar
+                </a>
+
+                <form th:action="@{/responsable/empleados/eliminar/{id}(id=${empleado.idEmpleado})}"
+                      method="post"
+                      class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

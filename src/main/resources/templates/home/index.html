@@ -38,12 +38,17 @@
         </div>
 
         <!-- 2. BLOQUE EXCLUSIVO PARA RESPONSABLE -->
-        <div class="col-md-4" sec:authorize="hasRole('RESPONSABLE')">
+        <div class="col-12" sec:authorize="hasRole('RESPONSABLE')">
             <div class="card h-100 shadow-sm border-success">
                 <div class="card-body">
-                    <h5 class="card-title text-success">Gestión de Unidad</h5>
-                    <p class="card-text text-muted">Alta y control de empleados, platos de menú y rentabilidad.</p>
-                    <a th:href="@{/responsable/empleados}" class="btn btn-success w-100">Administrar Empleados</a>
+                    <h5 class="card-title text-success">Ingresá al panel de administración de responsable</h5>
+                    <p class="card-text text-muted">
+                        Administrá los empleados y los platos. Obtené algun empleado por filtro. Calculo de canon y liquidacion de haberes
+                    </p>
+                    <a th:href="@{/responsable/}"
+                       class="btn btn-success w-100">
+                        Ir al panel de responsable
+                    </a>
                 </div>
             </div>
         </div>
