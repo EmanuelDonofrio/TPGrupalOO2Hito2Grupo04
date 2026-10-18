@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Getter @Setter @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Empleado {
+public class Empleado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

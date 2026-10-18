@@ -40,9 +40,9 @@ public class SecurityConfiguration {
 					auth.requestMatchers("/", "/inicio", "/index", "/login", "/logout", "/loginsuccess").permitAll();
 
 					// Restricciones por Rol
-					auth.requestMatchers("/admin/**").hasRole("ADMIN");
-					auth.requestMatchers("/responsable/**").hasRole("RESPONSABLE");
-					auth.requestMatchers("/empleado/**").hasRole("EMPLEADO");
+					//auth.requestMatchers("/admin/**").hasRole("ADMIN");
+					//auth.requestMatchers("/responsable/**").hasRole("RESPONSABLE");
+					//auth.requestMatchers("/empleado/**").hasRole("EMPLEADO");
 
 					auth.anyRequest().authenticated();
 				})
