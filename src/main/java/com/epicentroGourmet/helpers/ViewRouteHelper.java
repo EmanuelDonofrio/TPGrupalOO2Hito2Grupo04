@@ -3,6 +3,7 @@ package com.epicentroGourmet.helpers;
 public class ViewRouteHelper {
 	/**** Views ****/
 	//HOME
+	public static final String INICIO = "home/inicio";
 	public final static String INDEX = "home/index";
 	public final static String HELLO = "home/hello";
 

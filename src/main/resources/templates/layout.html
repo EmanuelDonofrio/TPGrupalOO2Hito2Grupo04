@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head th:fragment="head">
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -10,27 +10,33 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" th:fragment="navbar">
+    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" th:href="@{/index}">Epicentro Gourmet</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <!-- Logo / Marca principal -->
+            <a class="navbar-brand" th:href="@{/}">Epicentro Gourmet</a>
+
+            <!-- Botón para pantallas pequeñas / móviles -->
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                    data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                    aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto">
+
+            <!-- Elementos del menú -->
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/index}">Inicio</a>
                     </li>
-                </ul>
-                <ul class="navbar-nav">
+                    <!-- Menú desplegable de usuario -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                            <span th:text="${username != null ? username : 'Usuario'}">Usuario</span>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" data-toggle="dropdown"
+                           aria-haspopup="true" aria-expanded="false">
+                            Usuario
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item">Cerrar sesion</button>
-                            </form>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownUser">
+                            <a class="dropdown-item" th:href="@{/login}">Iniciar Sesión</a>
+                            <a class="dropdown-item" th:href="@{/logout}">Cerrar Sesión</a>
                         </div>
                     </li>
                 </ul>
