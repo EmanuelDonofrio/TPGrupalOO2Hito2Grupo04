@@ -1,6 +1,7 @@
 package com.epicentroGourmet.controllers;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,16 +12,15 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.epicentroGourmet.helpers.ViewRouteHelper;
-import com.epicentroGourmet.repositories.IEmpleadoRepository;
 
 @Controller
 @RequestMapping("/")
 public class HomeController {
 
-	private final IEmpleadoRepository empleadoRepository;
+	//private final IPersonService personService;
 	
-	public HomeController(IEmpleadoRepository empleadoRepository) {
-		this.empleadoRepository = empleadoRepository;
+	public HomeController() {
+
 	}
 
 	//GET Example: SERVER/index
@@ -28,13 +28,12 @@ public class HomeController {
 	public ModelAndView index() {
 		ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.INDEX);
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()
-				|| "anonymousUser".equals(authentication.getPrincipal())) {
+		Object principal = authentication != null ? authentication.getPrincipal() : null;
+		if (principal instanceof User user) {
+			modelAndView.addObject("username", user.getUsername());
+		} else {
 			modelAndView.addObject("username", "anonymous");
-			return modelAndView;
 		}
-
-		modelAndView.addObject("username", authentication.getName());
 
 		return modelAndView;
 	}
