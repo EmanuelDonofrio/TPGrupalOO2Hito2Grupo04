@@ -19,8 +19,9 @@ public abstract class UnidadVenta {
     @ManyToMany(mappedBy = "unidadesDeVenta")
     private Set<Festival> festivales = new HashSet<>();
 
-    //Una unidad de venta tiene un responsable a cargo. Conexion estructural bidireccional
-    @OneToOne(mappedBy = "unidadVentaACargo")
+    // Una unidad tiene un único responsable, independiente de sus empleados.
+    @OneToOne
+    @JoinColumn(name = "idResponsable", unique = true)
     private Empleado responsable;
 
     //Una unidad de venta tiene muchos platos que ofrece. Unidireccional
@@ -28,10 +29,8 @@ public abstract class UnidadVenta {
     @JoinColumn(name = "idUnidadVenta")
     private Set<Plato> menu = new HashSet<>();
 
-    //Una unidad de venta tiene muchos empleados y un empleado pertenece a una unica unidad de venta
-    //Unidireccional
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idUnidadVenta")
+    // Una unidad tiene muchos empleados y cada empleado pertenece a una unidad.
+    @OneToMany(mappedBy = "unidadVentaACargo", fetch = FetchType.LAZY)
     private Set<Empleado> empleados = new HashSet<>();
 
     //Una unidad de venta tiene muchos pedidos y un pedido pertenece a una unica unidad de venta

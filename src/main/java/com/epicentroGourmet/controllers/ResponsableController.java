@@ -1,6 +1,5 @@
 package com.epicentroGourmet.controllers;
 import com.epicentroGourmet.entities.Empleado;
-import com.epicentroGourmet.entities.UnidadVenta;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 @Controller
 @PreAuthorize("hasRole('RESPONSABLE')")
@@ -25,7 +26,11 @@ public class ResponsableController {
 
         Empleado empleado = empleadoService.obtenerEmpleado(authentication.getName());
 
+        List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(
+                empleado.getUnidadVentaACargo());
+
         ModelAndView modelAndView = new ModelAndView("responsable/responsable");
+
         modelAndView.addObject("username", authentication.getName());
         modelAndView.addObject("empleado", empleado);
         modelAndView.addObject("unidadVentaACargo", empleado.getUnidadVentaACargo());
@@ -33,9 +38,10 @@ public class ResponsableController {
                 ? empleado.getUnidadVentaACargo().getFestivales()
                 : java.util.Collections.emptySet());
 
+        modelAndView.addObject("empleados", empleados);
+
         return modelAndView;
 
     }
-
 
 }

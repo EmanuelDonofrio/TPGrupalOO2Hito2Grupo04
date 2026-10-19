@@ -103,69 +103,34 @@
                 <th scope="col">Antigüedad</th>
                 <th scope="col">DNI</th>
                 <th scope="col">Fecha de ingreso</th>
-                <th scope="col">Edad</th>
+                <th scope="col">Fecha de nacimiento</th>
                 <th scope="col">Sueldo base</th>
                 <th scope="col">Modificar</th>
                 <th scope="col">Eliminar</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>1</td>
-                <td>Lucía Fernández</td>
-                <td>5 años</td>
-                <td>32.456.789</td>
-                <td>15/03/2021</td>
-                <td>29</td>
-                <td>$450.000,00</td>
+            <tr th:each="empleado : ${empleados}">
+                <td th:text="${empleado.idEmpleado}"></td>
+                <td th:text="${empleado.nombre + ' ' + empleado.apellido}"></td>
+                <td th:text="${empleado.antiguedad + ' años'}"></td>
+                <td th:text="${empleado.dni}"></td>
+                <td th:text="${#temporals.format(empleado.fechaIngreso, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(empleado.fechaNacimiento, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#numbers.formatDecimal(empleado.sueldoBase, 1, 2)}"></td>
                 <td>
-                    <a th:href="@{/responsable/empleados/editar/1}"
+                    <a th:href="@{/responsable/empleados/editar/{id}(id=${empleado.idEmpleado})}"
                        class="btn btn-warning btn-sm">Modificar</a>
                 </td>
                 <td>
-                    <form th:action="@{/responsable/empleados/eliminar/1}"
+                    <form th:action="@{/responsable/empleados/eliminar/{id}(id=${empleado.idEmpleado})}"
                           method="post" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
                 </td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td>Martín González</td>
-                <td>3 años</td>
-                <td>35.782.146</td>
-                <td>01/08/2023</td>
-                <td>26</td>
-                <td>$420.000,00</td>
-                <td>
-                    <a th:href="@{/responsable/empleados/editar/2}"
-                       class="btn btn-warning btn-sm">Modificar</a>
-                </td>
-                <td>
-                    <form th:action="@{/responsable/empleados/eliminar/2}"
-                          method="post" class="d-inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Carolina Rodríguez</td>
-                <td>8 años</td>
-                <td>28.913.567</td>
-                <td>10/06/2018</td>
-                <td>34</td>
-                <td>$510.000,00</td>
-                <td>
-                    <a th:href="@{/responsable/empleados/editar/3}"
-                       class="btn btn-warning btn-sm">Modificar</a>
-                </td>
-                <td>
-                    <form th:action="@{/responsable/empleados/eliminar/3}"
-                          method="post" class="d-inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
+            <tr th:if="${#lists.isEmpty(empleados)}">
+                <td colspan="9" class="text-center text-muted">No hay empleados registrados.</td>
             </tr>
             </tbody>
         </table>

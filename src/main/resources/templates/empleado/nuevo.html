@@ -1,62 +1,115 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: head}"></head>
-
 <body>
 <nav th:replace="~{layout :: navbar}"></nav>
 
 <main class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Empleados</h1>
+    <h1 class="mb-4">Nuevo empleado</h1>
 
-        <a class="btn btn-success"
-           th:href="@{/responsable/empleados/nuevo}">
-            Agregar empleado
-        </a>
-    </div>
+    <form th:action="@{/empleado/create}" method="post">
+        <div class="card mb-4">
+            <div class="card-header">Datos de acceso</div>
+            <div class="card-body row g-3">
+                <div class="col-md-6">
+                    <label for="username" class="form-label">Username</label>
+                    <input id="username" name="username" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input id="password" name="password" type="password" class="form-control" required>
+                </div>
+            </div>
+        </div>
 
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>DNI</th>
-            <th>Tipo</th>
-            <th>Acciones</th>
-        </tr>
-        </thead>
+        <div class="card mb-4">
+            <div class="card-header">Datos del empleado</div>
+            <div class="card-body row g-3">
+                <div class="col-md-4">
+                    <label for="tipo" class="form-label">Tipo de empleado</label>
+                    <select id="tipo" name="tipo" class="form-select" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="COCINERO">Cocinero</option>
+                        <option value="CAJERO">Cajero</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input id="nombre" name="nombre" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input id="apellido" name="apellido" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="dni" class="form-label">DNI</label>
+                    <input id="dni" name="dni" type="number" min="1" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                    <input id="fechaNacimiento" name="fechaNacimiento" type="date" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fechaIngreso" class="form-label">Fecha de ingreso</label>
+                    <input id="fechaIngreso" name="fechaIngreso" type="date" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="sueldoBase" class="form-label">Sueldo base</label>
+                    <input id="sueldoBase" name="sueldoBase" type="number" min="0" step="0.01" class="form-control" required>
+                </div>
+            </div>
+        </div>
 
-        <tbody>
-        <tr th:each="empleado : ${empleados}">
-            <td th:text="${empleado.nombre}"></td>
-            <td th:text="${empleado.apellido}"></td>
-            <td th:text="${empleado.dni}"></td>
+        <div id="datosCocinero" class="card mb-4 d-none">
+            <div class="card-header">Atributos del cocinero</div>
+            <div class="card-body row g-3">
+                <div class="col-md-6">
+                    <label for="especialidad" class="form-label">Especialidad</label>
+                    <select id="especialidad" name="especialidad" class="form-select">
+                        <option value="">Seleccionar...</option>
+                        <option value="COCINERO">Cocinero</option>
+                        <option value="COCINERO_AYUDANTE">Cocinero ayudante</option>
+                        <option value="LAVAPLATOS">Lavaplatos</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="plusCategoria" class="form-label">Plus de categoría</label>
+                    <input id="plusCategoria" name="plusCategoria" type="number" min="0" step="0.01" class="form-control">
+                </div>
+            </div>
+        </div>
 
-            <!-- El tipo se puede mejorar luego con DTO -->
-            <td th:text="${empleado.getClass().simpleName}"></td>
+        <div id="datosCajero" class="card mb-4 d-none">
+            <div class="card-header">Atributos del cajero</div>
+            <div class="card-body">
+                <label for="turno" class="form-label">Turno</label>
+                <select id="turno" name="turno" class="form-select">
+                    <option value="">Seleccionar...</option>
+                    <option value="TURNO_MANIANA">Mañana</option>
+                    <option value="TURNO_TARDE">Tarde</option>
+                    <option value="TURNO_NOCHE">Noche</option>
+                </select>
+            </div>
+        </div>
 
-            <td>
-                <a class="btn btn-warning btn-sm"
-                   th:href="@{/responsable/empleados/editar/{id}(id=${empleado.idEmpleado})}">
-                    Editar
-                </a>
-
-                <form th:action="@{/responsable/empleados/eliminar/{id}(id=${empleado.idEmpleado})}"
-                      method="post"
-                      class="d-inline">
-                    <button type="submit" class="btn btn-danger btn-sm">
-                        Eliminar
-                    </button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+        <button type="submit" class="btn btn-primary">Crear empleado</button>
+    </form>
 </main>
 
 <footer th:replace="~{layout :: footer}"></footer>
 <div th:replace="~{layout :: scripts}"></div>
+<script>
+    const tipo = document.getElementById('tipo');
+    const datosCocinero = document.getElementById('datosCocinero');
+    const datosCajero = document.getElementById('datosCajero');
+
+    function mostrarAtributos() {
+        datosCocinero.classList.toggle('d-none', tipo.value !== 'COCINERO');
+        datosCajero.classList.toggle('d-none', tipo.value !== 'CAJERO');
+    }
+
+    tipo.addEventListener('change', mostrarAtributos);
+    mostrarAtributos();
+</script>
 </body>
 </html>

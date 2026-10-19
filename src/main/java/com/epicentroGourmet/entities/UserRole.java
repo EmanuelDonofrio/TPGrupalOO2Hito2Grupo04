@@ -1,6 +1,8 @@
 package com.epicentroGourmet.entities;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,7 +14,7 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name="user_role", uniqueConstraints=@UniqueConstraint(columnNames= {"role", "user_id"}))
+@Table(name = "user_role")
 public class UserRole {
 
 	public enum RolEnum{
@@ -25,9 +27,9 @@ public class UserRole {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idUserRole;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="user_id", nullable=false)
-	private User user;
+	@OneToMany(mappedBy = "userRole", fetch = FetchType.LAZY)
+	private Set<User> users = new HashSet<>();
+
 	@Enumerated(EnumType.STRING)
 	@Column(name="role", nullable=false, length=100)
 	private RolEnum role;
@@ -38,9 +40,8 @@ public class UserRole {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	public UserRole(int id, User user, RolEnum role) {
+	public UserRole(int id, RolEnum role) {
 		this.idUserRole = id;
-		this.user = user;
 		this.role = role;
 	}
 }

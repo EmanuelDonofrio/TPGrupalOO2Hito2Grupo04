@@ -1,8 +1,6 @@
 package com.epicentroGourmet.entities;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -37,8 +35,9 @@ public class User {
 	@OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
 	private Empleado empleado;
 
-	@OneToMany(fetch=FetchType.LAZY, mappedBy="user")
-	private Set<UserRole> userRoles = new HashSet<>();
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "user_role_id", nullable = false)
+	private UserRole userRole;
 
 	public User(String username, String password, boolean enabled) {
 		this.username = username;
@@ -46,10 +45,10 @@ public class User {
 		this.enabled = enabled;
 	}
 
-	public User(String username, String password, boolean enabled, Set<UserRole> userRoles) {
+	public User(String username, String password, boolean enabled, UserRole userRole) {
 		this.username = username;
 		this.password = password;
 		this.enabled = enabled;
-		this.userRoles = userRoles;
+		this.userRole = userRole;
 	}
 }
