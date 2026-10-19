@@ -1,9 +1,7 @@
 package com.epicentroGourmet.services.implementation;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,7 +26,7 @@ public class UserService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		com.epicentroGourmet.entities.User user = userRepository.findByUsernameAndFetchUserRolesEagerly(username);
-		return buildUser(user, buildGrantedAuthorities(user.getUserRoles()));
+		return buildUser(user, buildGrantedAuthorities(user.getUserRole()));
 	}
 
 	private User buildUser(com.epicentroGourmet.entities.User user, List<GrantedAuthority> grantedAuthorities) {
@@ -37,11 +35,9 @@ public class UserService implements UserDetailsService {
 						grantedAuthorities);
 	}
 
-	private List<GrantedAuthority> buildGrantedAuthorities(Set<UserRole> userRoles) {
-		Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-		for(UserRole userRole: userRoles) {
-			grantedAuthorities.add(new SimpleGrantedAuthority(userRole.getRole().name()));
-		}
-		return new ArrayList<>(grantedAuthorities);
+	private List<GrantedAuthority> buildGrantedAuthorities(UserRole userRole) {
+		List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+		grantedAuthorities.add(new SimpleGrantedAuthority(userRole.getRole().name()));
+		return grantedAuthorities;
 	}
 }

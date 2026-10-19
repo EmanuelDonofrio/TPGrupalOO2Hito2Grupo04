@@ -9,15 +9,14 @@ import java.time.LocalDate;
 @Entity
 @Getter @Setter @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Empleado {
+public class Empleado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEmpleado;
 
-    //Bidireccionalidad
-    //Se puede crear un empleado sin asociarse directamente como responsable de una unidad de venta
-    @OneToOne(optional = true)
+    // Muchos empleados pueden pertenecer a una misma unidad de venta.
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idUnidadVenta")
     private UnidadVenta unidadVentaACargo;
 
