@@ -12,15 +12,17 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.epicentroGourmet.helpers.ViewRouteHelper;
+import com.epicentroGourmet.services.implementation.UnidadVentaService;
 
 @Controller
 @RequestMapping("/")
 public class HomeController {
 
 	//private final IPersonService personService;
-	
-	public HomeController() {
+	private final UnidadVentaService unidadVentaService;
 
+	public HomeController(UnidadVentaService unidadVentaService) {
+		this.unidadVentaService = unidadVentaService;
 	}
 
 	//GET Example: SERVER/index
@@ -58,4 +60,13 @@ public class HomeController {
 	public RedirectView redirectToHomeIndex() {
 		return new RedirectView(ViewRouteHelper.ROUTE);
 	}
+
+	// VISTA PRINCIPAL ADMINISTRADOR
+	@GetMapping("/admin/festivales")
+	public ModelAndView verHomeAdmin() {
+		ModelAndView mav = new ModelAndView("home/home_admin");
+		mav.addObject("unidades", unidadVentaService.listarTodas());
+		return mav;
+	}
+	
 }
