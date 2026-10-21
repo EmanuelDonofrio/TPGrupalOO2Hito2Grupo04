@@ -1,5 +1,6 @@
 package com.epicentroGourmet.controllers;
 
+import com.epicentroGourmet.services.IFestivalService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.Authentication;
@@ -18,14 +19,23 @@ import com.epicentroGourmet.services.implementation.UnidadVentaService;
 @RequestMapping("/")
 public class HomeController {
 
-	//private final IPersonService personService;
+	private final IFestivalService festivalService;
 	private final UnidadVentaService unidadVentaService;
 
-	public HomeController(UnidadVentaService unidadVentaService) {
+	public HomeController(IFestivalService festivalService,UnidadVentaService unidadVentaService) {
+		this.festivalService = festivalService;
 		this.unidadVentaService = unidadVentaService;
 	}
 
-	//GET Example: SERVER/index
+	// PORTADA (al iniciar)
+	@GetMapping({"", "/", "/inicio"})
+	public ModelAndView inicio(){
+		ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.INICIO);
+		modelAndView.addObject("festivales", festivalService.getAll());
+		return modelAndView;
+	}
+
+	// Panel POST-LOGIN (Dashboard general por roles)
 	@GetMapping("/index")
 	public ModelAndView index() {
 		ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.INDEX);
@@ -40,26 +50,7 @@ public class HomeController {
 		return modelAndView;
 	}
 
-	//GET Example: SERVER/hello?name=someName
-	@GetMapping("/hello")
-	public ModelAndView helloParams1(@RequestParam(required=false, defaultValue="null") String name) {
-		ModelAndView mV = new ModelAndView(ViewRouteHelper.HELLO);
-		mV.addObject("name", name);
-		return mV;
-	}
 
-	//GET Example: SERVER/hello/someName
-	@GetMapping("/hello/{name}")
-	public ModelAndView helloParams2(@PathVariable String name) {
-		ModelAndView mV = new ModelAndView(ViewRouteHelper.HELLO);
-		mV.addObject("name", name);
-		return mV;
-	}
-
-	@GetMapping("/")
-	public RedirectView redirectToHomeIndex() {
-		return new RedirectView(ViewRouteHelper.ROUTE);
-	}
 
 	// VISTA PRINCIPAL ADMINISTRADOR
 	@GetMapping("/admin/festivales")
