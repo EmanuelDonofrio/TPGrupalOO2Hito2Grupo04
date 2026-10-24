@@ -3,6 +3,7 @@ package com.epicentroGourmet.controllers;
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
 import com.epicentroGourmet.entities.Cajero;
 import com.epicentroGourmet.entities.Cocinero;
+import com.epicentroGourmet.helpers.ViewRouteHelper;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,6 +53,6 @@ public class EmpleadoController {
 
         empleadoService.crear(form, authentication.getName());
         redirectAttributes.addFlashAttribute("mensaje", "Empleado creado correctamente.");
-        return new ModelAndView("redirect:/responsable/");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
     }
 }
