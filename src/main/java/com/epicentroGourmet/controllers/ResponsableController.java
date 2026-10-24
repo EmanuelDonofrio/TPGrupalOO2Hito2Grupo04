@@ -45,4 +45,15 @@ public class ResponsableController {
 
     }
 
+    @GetMapping("/empleados")
+    public ModelAndView verEmpleados(Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(
+                responsable.getUnidadVentaACargo());
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
+        modelAndView.addObject("empleados", empleados);
+        return modelAndView;
+    }
+
 }

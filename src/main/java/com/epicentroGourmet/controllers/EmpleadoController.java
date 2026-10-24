@@ -3,14 +3,12 @@ package com.epicentroGourmet.controllers;
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
 import com.epicentroGourmet.entities.Cajero;
 import com.epicentroGourmet.entities.Cocinero;
+import com.epicentroGourmet.helpers.ViewRouteHelper;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.validation.BindingResult;
@@ -52,6 +50,15 @@ public class EmpleadoController {
 
         empleadoService.crear(form, authentication.getName());
         redirectAttributes.addFlashAttribute("mensaje", "Empleado creado correctamente.");
-        return new ModelAndView("redirect:/responsable/");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
+    }
+
+    @PostMapping("/eliminar/{id}")
+    public ModelAndView eliminarEmpleado(@PathVariable("id") Long id,
+                                         RedirectAttributes redirectAttributes) {
+        empleadoService.eliminar(id);
+        redirectAttributes.addFlashAttribute("mensaje",
+                "Empleado habilitado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
     }
 }
