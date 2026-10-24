@@ -19,8 +19,6 @@ public class EmpleadoDTOForm {
     private LocalDate fechaNacimiento;
     private LocalDate fechaIngreso;
     private Integer antiguedad;
-    private Double sueldoBase;
     private Cocinero.EspecialidadCocinaEnum especialidad;
-    private Double plusCategoria;
     private Cajero.turnoEnum turno;
 }
