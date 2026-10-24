@@ -41,15 +41,12 @@ public class EmpleadoService {
 
     }
 
-    public List<Empleado> obtenerTodos() {
-        return empleadoRepository.findAll();
-    }
-
     public List<Empleado> obtenerPorUnidadVenta(UnidadVenta unidadVenta) {
         if (unidadVenta == null) {
             return List.of();
         }
-        return empleadoRepository.findByUnidadVentaACargo(unidadVenta);
+        return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRole(
+                unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO);
     }
 
     @Transactional
