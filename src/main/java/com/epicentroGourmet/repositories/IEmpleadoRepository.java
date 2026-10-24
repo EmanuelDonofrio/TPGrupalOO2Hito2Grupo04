@@ -2,6 +2,7 @@ package com.epicentroGourmet.repositories;
 
 import com.epicentroGourmet.entities.Empleado;
 import com.epicentroGourmet.entities.UnidadVenta;
+import com.epicentroGourmet.entities.UserRole;
 import java.util.Optional;
 import java.util.List;
 
@@ -17,5 +18,6 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
     //empleado directamente, sino del Usuario del empleado
     Optional<Empleado> findByUsuarioUsername(String username);
 
-    List<Empleado> findByUnidadVentaACargo(UnidadVenta unidadVenta);
+    List<Empleado> findByUnidadVentaACargoAndUsuarioUserRoleRole(
+            UnidadVenta unidadVenta, UserRole.RolEnum role);
 }
