@@ -12,6 +12,7 @@ import com.epicentroGourmet.repositories.IUserRoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -46,8 +47,8 @@ public class EmpleadoService {
         if (unidadVenta == null) {
             return List.of();
         }
-        return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRole(
-                unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO);
+        return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
+                unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, true);
     }
 
     @Transactional
@@ -131,6 +132,17 @@ public class EmpleadoService {
 
         return empleadoRepository.save(empleado);
 
+    }
+
+    @Transactional
+    public boolean eliminar(Long id) {
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No existe un empleado con el ID " + id + "."));
+
+        empleado.getUsuario().setEnabled(false);
+        userRepository.save(empleado.getUsuario());
+        return true;
     }
 
     private double calcularPorcentajeFestival(long cantidadDiasFestival) {

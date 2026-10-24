@@ -18,6 +18,6 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
     //empleado directamente, sino del Usuario del empleado
     Optional<Empleado> findByUsuarioUsername(String username);
 
-    List<Empleado> findByUnidadVentaACargoAndUsuarioUserRoleRole(
-            UnidadVenta unidadVenta, UserRole.RolEnum role);
+    List<Empleado> findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
+            UnidadVenta unidadVenta, UserRole.RolEnum role, boolean enabled);
 }

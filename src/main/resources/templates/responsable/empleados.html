@@ -45,8 +45,13 @@
                        class="btn btn-warning btn-sm">Modificar</a>
                 </td>
                 <td>
-                    <a th:href="@{/empleado/eliminar/{id}(id=${empleado.idEmpleado})}"
-                       class="btn btn-danger btn-sm">Eliminar</a>
+                    <form th:action="@{/empleado/eliminar/{id}(id=${empleado.idEmpleado})}"
+                          method="post" class="d-inline"
+                          onsubmit="return confirm('¿Desea eliminar este empleado?');">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Eliminar
+                        </button>
+                    </form>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(empleados)}">
