@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,8 +31,12 @@ public class Festival {
 
     private String temporada;
 
+    @NotNull(message = "La fecha de inicio es obligatoria")
+    @Column(nullable = false)
     private LocalDate fechaInicio;
 
+    @NotNull(message = "La fecha de fin es obligatoria")
+    @Column(nullable = false)
     private LocalDate fechaFin;
 
     public Festival(String nombre, String temporada, LocalDate fechaInicio, LocalDate fechaFin) {
