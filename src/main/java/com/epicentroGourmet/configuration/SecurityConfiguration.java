@@ -37,7 +37,7 @@ public class SecurityConfiguration {
 					auth.requestMatchers("/css/*", "/imgs/*", "/js/*", "/vendor/bootstrap/css/*",
 							"/vendor/jquery/*", "/vendor/bootstrap/js/*").permitAll();
 
-					auth.requestMatchers("/", "/inicio", "/index", "/login", "/logout", "/loginsuccess").permitAll();
+					auth.requestMatchers("/", "/inicio", "/unidad-venta/**", "/index", "/login", "/logout", "/loginsuccess").permitAll();
 
 					// Restricciones por Rol
 					//auth.requestMatchers("/admin/**").hasRole("ADMIN");
