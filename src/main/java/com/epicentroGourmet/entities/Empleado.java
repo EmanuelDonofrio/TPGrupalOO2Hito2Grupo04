@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.Period;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
@@ -49,4 +50,22 @@ public class Empleado {
         this.fechaNacimiento = fechaNacimiento;
         this.dni = dni;
     }
+
+    //metodo de dominio
+    public int calcularAntiguedad(){
+        if(this.fechaIngreso == null){
+            return 0;
+        }
+        return Period.between(this.fechaIngreso, LocalDate.now()).getYears();
+    }
+
+    // Sincroniza el campo 'antiguedad' antes de guardar o al cargar de la BD
+    @PrePersist
+    @PreUpdate
+    @PostLoad
+    public void sincronizarAntiguedad(){
+        this.antiguedad = calcularAntiguedad();
+    }
+
+
 }
