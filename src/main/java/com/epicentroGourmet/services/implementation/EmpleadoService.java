@@ -9,6 +9,7 @@ import com.epicentroGourmet.entities.UserRole;
 import com.epicentroGourmet.repositories.IEmpleadoRepository;
 import com.epicentroGourmet.repositories.IUserRepository;
 import com.epicentroGourmet.repositories.IUserRoleRepository;
+import com.epicentroGourmet.services.negocio.PoliticaSalarial;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,8 +82,8 @@ public class EmpleadoService {
         int antiguedad = Period.between(form.getFechaIngreso(), LocalDate.now()).getYears();
 
         // LIQUIDACION DE HABERES
-        double plusAntiguedad = 5000;
-        double sueldoBase = 100000;
+        double plusAntiguedad = PoliticaSalarial.PLUS_ANTIGUEDAD;
+        double sueldoBase = PoliticaSalarial.SUELDO_BASE;
 
         double sueldo = sueldoBase + (plusAntiguedad * antiguedad);
 
@@ -98,11 +99,11 @@ public class EmpleadoService {
 
             double plusCategoria;
             if (Cocinero.EspecialidadCocinaEnum.COCINERO == form.getEspecialidad()) {
-                plusCategoria = 150000;
+                plusCategoria = PoliticaSalarial.PLUS_COCINERO;
             } else if (Cocinero.EspecialidadCocinaEnum.COCINERO_AYUDANTE == form.getEspecialidad()) {
-                plusCategoria = 100000;
+                plusCategoria = PoliticaSalarial.PLUS_COCINERO_AYUDANTE;
             } else if (Cocinero.EspecialidadCocinaEnum.LAVAPLATOS == form.getEspecialidad()) {
-                plusCategoria = 50000;
+                plusCategoria = PoliticaSalarial.PLUS_LAVAPLATOS;
             } else {
                 throw new IllegalArgumentException("Especialidad de cocinero inválida.");
             }
@@ -158,7 +159,7 @@ public class EmpleadoService {
         // 16 días / 15 = 1,06 → ceil = 2 → 2 × 0,5 = 1,0  → 100%
         // 30 días / 15 = 2    → ceil = 2 → 2 × 0,5 = 1,0  → 100%
         // 31 días / 15 = 2,06 → ceil = 3 → 3 × 0,5 = 1,5  → 150%
-        return Math.ceil(cantidadDiasFestival / 15.0) * 0.5;
+        return Math.ceil(cantidadDiasFestival / PoliticaSalarial.DIAS_BLOQUE_FESTIVAL) * PoliticaSalarial.PORCENTAJE_BLOQUE_FESTIVAL;
     }
 
 }
