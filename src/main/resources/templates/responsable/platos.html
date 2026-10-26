@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+
 <body>
 
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <main class="container py-4">
+        <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+                <h1>Platos</h1>
+                <p class="text-muted">Platos ofrecidos por la unidad de venta a tu cargo.</p>
+            </div>
+
+            <a th:href="@{/plato/nuevo}" class="btn btn-success">
+                Agregar nuevo plato
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio de venta</th>
+                    <th scope="col">Precio de costo</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="plato : ${platos}">
+                    <td th:text="${plato.idPlato}"></td>
+                    <td th:text="${plato.nombre}"></td>
+                    <td th:text="${#numbers.formatDecimal(plato.precioVenta, 1, 2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(plato.precioCosto, 1, 2)}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(platos)}">
+                    <td colspan="4" class="text-center text-muted">
+                        No hay platos registrados en tu unidad de venta.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    <div th:replace="~{layout :: scripts}"></div>
+
 </body>
+
 </html>

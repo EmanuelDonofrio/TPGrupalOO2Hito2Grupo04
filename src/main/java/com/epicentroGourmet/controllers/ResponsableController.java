@@ -1,7 +1,9 @@
 package com.epicentroGourmet.controllers;
 import com.epicentroGourmet.entities.Empleado;
+import com.epicentroGourmet.entities.Plato;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
+import com.epicentroGourmet.services.implementation.PlatoService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -17,9 +19,11 @@ import java.util.List;
 public class ResponsableController {
 
     private final EmpleadoService empleadoService;
+    private final PlatoService platoService;
 
-    public ResponsableController(EmpleadoService empleadoService) {
+    public ResponsableController(EmpleadoService empleadoService, PlatoService platoService) {
         this.empleadoService = empleadoService;
+        this.platoService = platoService;
     }
 
     @GetMapping("/")
@@ -53,6 +57,17 @@ public class ResponsableController {
 
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
         modelAndView.addObject("empleados", empleados);
+        return modelAndView;
+    }
+
+    @GetMapping("/platos")
+    public ModelAndView verPlatos(Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        List<Plato> platos = platoService.obtenerPorUnidadVenta(
+                responsable.getUnidadVentaACargo());
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_PLATOS);
+        modelAndView.addObject("platos", platos);
         return modelAndView;
     }
 
