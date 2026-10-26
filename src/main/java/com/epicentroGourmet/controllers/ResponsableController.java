@@ -139,5 +139,15 @@ public class ResponsableController {
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
     }
 
+    @PostMapping("/platos/eliminar/{id}")
+    public ModelAndView eliminarPlato(@PathVariable("id") Long id,
+                                         RedirectAttributes redirectAttributes,
+                                         Authentication authentication) {
+        platoService.eliminar(id, authentication.getName());
+        redirectAttributes.addFlashAttribute("mensaje",
+                "Plato eliminado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
+    }
+
 
 }

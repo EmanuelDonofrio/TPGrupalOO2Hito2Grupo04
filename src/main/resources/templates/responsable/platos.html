@@ -27,6 +27,7 @@
                     <th scope="col">Nombre</th>
                     <th scope="col">Precio de venta</th>
                     <th scope="col">Precio de costo</th>
+                    <th scope="col">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -35,9 +36,18 @@
                     <td th:text="${plato.nombre}"></td>
                     <td th:text="${#numbers.formatDecimal(plato.precioVenta, 1, 2)}"></td>
                     <td th:text="${#numbers.formatDecimal(plato.precioCosto, 1, 2)}"></td>
+                    <td>
+                        <form th:action="@{/responsable/platos/eliminar/{id}(id=${plato.idPlato})}"
+                              method="post">
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('¿Eliminar este plato?');">
+                                Eliminar
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(platos)}">
-                    <td colspan="4" class="text-center text-muted">
+                    <td colspan="5" class="text-center text-muted">
                         No hay platos registrados en tu unidad de venta.
                     </td>
                 </tr>

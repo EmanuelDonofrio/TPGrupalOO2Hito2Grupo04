@@ -31,6 +31,15 @@
         <button type="submit" class="btn btn-primary">Crear plato</button>
         <a th:href="@{/responsable/platos}" class="btn btn-secondary">Cancelar</a>
     </form>
+
+    <form th:if="${plato.idPlato != null}"
+          th:action="@{/responsable/platos/eliminar/{id}(id=${plato.idPlato})}"
+          method="post" class="d-inline">
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('¿Eliminar este plato?');">
+            Eliminar
+        </button>
+    </form>
 </main>
 
 <footer th:replace="~{layout :: footer}"></footer>
