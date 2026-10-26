@@ -11,7 +11,7 @@
             <h1>Empleados</h1>
             <p class="text-muted mb-0">Administración de empleados de la unidad de venta.</p>
         </div>
-        <a th:href="@{/empleado/nuevo}" class="btn btn-success">
+        <a th:href="@{/responsable/empleados/nuevo}" class="btn btn-success">
             Agregar nuevo empleado
         </a>
     </div>
@@ -45,7 +45,7 @@
                        class="btn btn-warning btn-sm">Modificar</a>
                 </td>
                 <td>
-                    <form th:action="@{/empleado/eliminar/{id}(id=${empleado.idEmpleado})}"
+                    <form th:action="@{/responsable/empleados/eliminar/{id}(id=${empleado.idEmpleado})}"
                           method="post" class="d-inline"
                           onsubmit="return confirm('¿Desea eliminar este empleado?');">
                         <button type="submit" class="btn btn-danger btn-sm">
