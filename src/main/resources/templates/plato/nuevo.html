@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <h1 class="mb-4">Nuevo Plato</h1>
+
+    <form th:action="@{/responsable/platos/create}" th:object="${plato}" method="post">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input id="nombre" type="text" class="form-control" th:field="*{nombre}" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="precioVenta" class="form-label">Precio de venta</label>
+            <input id="precioVenta" type="number" class="form-control" th:field="*{precioVenta}"
+                   min="0" step="0.01" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('precioVenta')}" th:errors="*{precioVenta}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="precioCosto" class="form-label">Precio de costo</label>
+            <input id="precioCosto" type="number" class="form-control" th:field="*{precioCosto}"
+                   min="0" step="0.01" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('precioCosto')}" th:errors="*{precioCosto}"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Crear plato</button>
+        <a th:href="@{/responsable/platos}" class="btn btn-secondary">Cancelar</a>
+    </form>
+
+    <form th:if="${plato.idPlato != null}"
+          th:action="@{/responsable/platos/eliminar/{id}(id=${plato.idPlato})}"
+          method="post" class="d-inline">
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('¿Eliminar este plato?');">
+            Eliminar
+        </button>
+    </form>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

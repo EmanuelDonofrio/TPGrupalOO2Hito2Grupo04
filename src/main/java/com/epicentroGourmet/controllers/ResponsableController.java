@@ -3,8 +3,10 @@ import com.epicentroGourmet.dto.EmpleadoDTOForm;
 import com.epicentroGourmet.entities.Cajero;
 import com.epicentroGourmet.entities.Cocinero;
 import com.epicentroGourmet.entities.Empleado;
+import com.epicentroGourmet.entities.Plato;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
+import com.epicentroGourmet.services.implementation.PlatoService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,9 +24,11 @@ import java.util.List;
 public class ResponsableController {
 
     private final EmpleadoService empleadoService;
+    private final PlatoService platoService;
 
-    public ResponsableController(EmpleadoService empleadoService) {
+    public ResponsableController(EmpleadoService empleadoService, PlatoService platoService) {
         this.empleadoService = empleadoService;
+        this.platoService = platoService;
     }
 
     @GetMapping("/")
@@ -63,7 +67,7 @@ public class ResponsableController {
 
     @GetMapping("/empleados/nuevo")
     public ModelAndView crearEmpleado() {
-        ModelAndView modelAndView = new ModelAndView("empleado/nuevo");
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.EMPLEADO_NUEVO);
         modelAndView.addObject("empleado", new EmpleadoDTOForm());
         modelAndView.addObject("especialidades", Cocinero.EspecialidadCocinaEnum.values());
         modelAndView.addObject("turnos", Cajero.turnoEnum.values());
@@ -76,7 +80,7 @@ public class ResponsableController {
                                         RedirectAttributes redirectAttributes,
                                         Authentication authentication) {
 
-        ModelAndView modelAndView = new ModelAndView("empleado/nuevo");
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.EMPLEADO_NUEVO);
         modelAndView.addObject("especialidades", Cocinero.EspecialidadCocinaEnum.values());
         modelAndView.addObject("turnos", Cajero.turnoEnum.values());
 
@@ -97,5 +101,53 @@ public class ResponsableController {
                 "Empleado habilitado correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
     }
+
+
+    @GetMapping("/platos")
+    public ModelAndView verPlatos(Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        List<Plato> platos = platoService.obtenerPorUnidadVenta(
+                responsable.getUnidadVentaACargo());
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_PLATOS);
+        modelAndView.addObject("platos", platos);
+        return modelAndView;
+    }
+
+
+    @GetMapping("/platos/nuevo")
+    public ModelAndView crearPlato() {
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.PLATO_NUEVO);
+        modelAndView.addObject("plato", new Plato());
+        return modelAndView;
+    }
+
+    @PostMapping("/platos/create")
+    public ModelAndView guardarPlato(@Valid @ModelAttribute("plato") Plato plato,
+                                        BindingResult bindingResult,
+                                        RedirectAttributes redirectAttributes,
+                                        Authentication authentication) {
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.PLATO_NUEVO);
+
+        if (bindingResult.hasErrors()) {
+            return modelAndView;
+        }
+
+        platoService.crear(plato, authentication.getName());
+        redirectAttributes.addFlashAttribute("mensaje", "Plato creado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
+    }
+
+    @PostMapping("/platos/eliminar/{id}")
+    public ModelAndView eliminarPlato(@PathVariable("id") Long id,
+                                         RedirectAttributes redirectAttributes,
+                                         Authentication authentication) {
+        platoService.eliminar(id, authentication.getName());
+        redirectAttributes.addFlashAttribute("mensaje",
+                "Plato eliminado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
+    }
+
 
 }

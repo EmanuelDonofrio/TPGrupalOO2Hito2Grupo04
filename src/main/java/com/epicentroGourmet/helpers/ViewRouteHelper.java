@@ -17,14 +17,20 @@ public class ViewRouteHelper {
 	// RESPONSABLE
 	public final static String RESPONSABLE_EMPLEADOS = "responsable/empleados";
 	public final static String RESPONSABLE_INICIO = "responsable/inicio";
+	public final static String RESPONSABLE_PLATOS = "responsable/platos";
 
 	// EMPLEADO
 	public final static String EMPLEADO_PERFIL = "empleado/perfil";
+	public final static String EMPLEADO_NUEVO = "empleado/nuevo";
+
+	// PLATO
+	public final static String PLATO_NUEVO = "plato/nuevo";
 
 	/**** Redirects ****/
 	public final static String ROUTE = "/index";
 	public final static String ROUTE_ADMIN_FESTIVALES = "redirect:/admin/festivales";
 	public final static String ROUTE_RESPONSABLE_EMPLEADOS = "redirect:/responsable/empleados";
 	public final static String ROUTE_EMPLEADO_PERFIL = "redirect:/empleado/mi-informacion";
+	public final static String ROUTE_RESPONSABLE_PLATOS = "redirect:/responsable/platos";
 
 }
