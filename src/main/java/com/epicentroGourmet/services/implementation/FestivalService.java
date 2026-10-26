@@ -21,5 +21,14 @@ public class FestivalService implements IFestivalService {
         return festivalRepository.findAll();
     }
 
+    @Override
+    public List<Festival> traerFestivalesPorUnidad(Long idUnidad){
+        if (idUnidad == null){
+            return List.of();
+        }
+        return festivalRepository.findFestivalesByUnidadVentaId(idUnidad);
+    }
+
+
 
 }

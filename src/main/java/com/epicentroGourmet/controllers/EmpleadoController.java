@@ -1,9 +1,11 @@
 package com.epicentroGourmet.controllers;
 
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
-import com.epicentroGourmet.entities.Cajero;
-import com.epicentroGourmet.entities.Cocinero;
+import com.epicentroGourmet.entities.*;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
+import com.epicentroGourmet.repositories.IFestivalRepository;
+import com.epicentroGourmet.repositories.IUserRepository;
+import com.epicentroGourmet.services.IFestivalService;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,51 +16,43 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.validation.BindingResult;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 @Controller
-@PreAuthorize("hasRole('RESPONSABLE')")
+@PreAuthorize("hasRole('EMPLEADO')")
 @RequestMapping("/empleado")
 public class EmpleadoController {
 
-    private final EmpleadoService empleadoService;
+    private final IUserRepository userRepository;
+    private final IFestivalService festivalService;
 
-    public EmpleadoController(EmpleadoService empleadoService) {
-        this.empleadoService = empleadoService;
+    public EmpleadoController(IUserRepository userRepository, IFestivalService festivalService) {
+        this.userRepository = userRepository;
+        this.festivalService = festivalService;
     }
 
-    @GetMapping("/nuevo")
-    public ModelAndView crearEmpleado() {
-        ModelAndView modelAndView = new ModelAndView("empleado/nuevo");
-        modelAndView.addObject("empleado", new EmpleadoDTOForm());
-        modelAndView.addObject("especialidades", Cocinero.EspecialidadCocinaEnum.values());
-        modelAndView.addObject("turnos", Cajero.turnoEnum.values());
-        return modelAndView;
-    }
+    // 1. Ver su información personal, unidad y festivales
+    @GetMapping("/mi-informacion")
+    public ModelAndView verMiInformacion(Authentication authentication){
+        ModelAndView mav = new ModelAndView("empleado/informacion");
+        User user = userRepository.findByUsername(authentication.getName());
 
-    @PostMapping("/create")
-    public ModelAndView guardarEmpleado(@Valid @ModelAttribute("empleado") EmpleadoDTOForm form,
-                                        BindingResult bindingResult,
-                                        RedirectAttributes redirectAttributes,
-                                        Authentication authentication) {
+        if(user != null && user.getEmpleado() != null){
+            Empleado empleado = user.getEmpleado();
+            UnidadVenta unidad = empleado.getUnidadVentaACargo();
 
-        ModelAndView modelAndView = new ModelAndView("empleado/nuevo");
-        modelAndView.addObject("especialidades", Cocinero.EspecialidadCocinaEnum.values());
-        modelAndView.addObject("turnos", Cajero.turnoEnum.values());
+            mav.addObject("empleado", empleado);
+            mav.addObject("unidad", unidad);
 
-        if (bindingResult.hasErrors()) {
-            return modelAndView;
+            if (unidad != null){
+                List<Festival> festivales = festivalService.traerFestivalesPorUnidad(unidad.getIdUnidadVenta());
+                mav.addObject("festivales", festivales);
+            }else{
+                mav.addObject("festivales", List.of());
+            }
         }
-
-        empleadoService.crear(form, authentication.getName());
-        redirectAttributes.addFlashAttribute("mensaje", "Empleado creado correctamente.");
-        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
+        return mav;
     }
 
-    @PostMapping("/eliminar/{id}")
-    public ModelAndView eliminarEmpleado(@PathVariable("id") Long id,
-                                         RedirectAttributes redirectAttributes) {
-        empleadoService.eliminar(id);
-        redirectAttributes.addFlashAttribute("mensaje",
-                "Empleado habilitado correctamente.");
-        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
-    }
+
 }

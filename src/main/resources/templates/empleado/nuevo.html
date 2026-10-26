@@ -7,17 +7,17 @@
 <main class="container py-4">
     <h1 class="mb-4">Nuevo empleado</h1>
 
-    <form th:action="@{/empleado/create}" method="post">
+    <form th:action="@{/responsable/empleados/create}" th:object="${empleado}" method="post">
         <div class="card mb-4">
             <div class="card-header">Datos de acceso</div>
             <div class="card-body row g-3">
                 <div class="col-md-6">
                     <label for="username" class="form-label">Username</label>
-                    <input id="username" name="username" type="text" class="form-control" required>
+                    <input id="username" name="username" type="text" class="form-control" th:field="*{username}" required>
                 </div>
                 <div class="col-md-6">
                     <label for="password" class="form-label">Contraseña</label>
-                    <input id="password" name="password" type="password" class="form-control" required>
+                    <input id="password" name="password" type="password" class="form-control" th:field="*{password}" required>
                 </div>
             </div>
         </div>
@@ -27,7 +27,7 @@
             <div class="card-body row g-3">
                 <div class="col-md-4">
                     <label for="tipo" class="form-label">Tipo de empleado</label>
-                    <select id="tipo" name="tipo" class="form-select" required>
+                    <select id="tipo"  class="form-select" th:field="*{tipo}" required>
                         <option value="">Seleccionar...</option>
                         <option value="COCINERO">Cocinero</option>
                         <option value="CAJERO">Cajero</option>
@@ -35,23 +35,23 @@
                 </div>
                 <div class="col-md-4">
                     <label for="nombre" class="form-label">Nombre</label>
-                    <input id="nombre" name="nombre" type="text" class="form-control" required>
+                    <input id="nombre"  type="text"  class="form-control" th:field="*{nombre}" required>
                 </div>
                 <div class="col-md-4">
                     <label for="apellido" class="form-label">Apellido</label>
-                    <input id="apellido" name="apellido" type="text" class="form-control" required>
+                    <input id="apellido"  type="text" class="form-control" th:field="*{apellido}" required>
                 </div>
                 <div class="col-md-4">
                     <label for="dni" class="form-label">DNI</label>
-                    <input id="dni" name="dni" type="number" min="1" class="form-control" required>
+                    <input id="dni"  type="number" min="1" class="form-control" th:field="*{dni}" required>
                 </div>
                 <div class="col-md-4">
                     <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
-                    <input id="fechaNacimiento" name="fechaNacimiento" type="date" class="form-control" required>
+                    <input id="fechaNacimiento"  type="date" class="form-control" th:field="*{fechaNacimiento}" required>
                 </div>
                 <div class="col-md-4">
                     <label for="fechaIngreso" class="form-label">Fecha de ingreso</label>
-                    <input id="fechaIngreso" name="fechaIngreso" type="date" class="form-control" required>
+                    <input id="fechaIngreso"  type="date" class="form-control" th:field="*{fechaIngreso}" required>
                 </div>
             </div>
         </div>
@@ -61,11 +61,12 @@
             <div class="card-body row g-3">
                 <div class="col-md-6">
                     <label for="especialidad" class="form-label">Especialidad</label>
-                    <select id="especialidad" name="especialidad" class="form-select">
+                    <select id="especialidad" class="form-select" th:field="*{especialidad}">
                         <option value="">Seleccionar...</option>
-                        <option value="COCINERO">Cocinero</option>
-                        <option value="COCINERO_AYUDANTE">Cocinero ayudante</option>
-                        <option value="LAVAPLATOS">Lavaplatos</option>
+                        <option th:each="esp : ${especialidades}" th:value="${esp}" th:text="${esp}"></option>
+<!--                        <option value="COCINERO">Cocinero</option>-->
+<!--                        <option value="COCINERO_AYUDANTE">Cocinero ayudante</option>-->
+<!--                        <option value="LAVAPLATOS">Lavaplatos</option>-->
                     </select>
                 </div>
             </div>
@@ -77,9 +78,10 @@
                 <label for="turno" class="form-label">Turno</label>
                 <select id="turno" name="turno" class="form-select">
                     <option value="">Seleccionar...</option>
-                    <option value="TURNO_MANIANA">Mañana</option>
-                    <option value="TURNO_TARDE">Tarde</option>
-                    <option value="TURNO_NOCHE">Noche</option>
+                    <option th:each="tur : ${turnos}" th:value="${tur}" th:text="${tur}"></option>
+<!--                    <option value="TURNO_MANIANA">Mañana</option>-->
+<!--                    <option value="TURNO_TARDE">Tarde</option>-->
+<!--                    <option value="TURNO_NOCHE">Noche</option>-->
                 </select>
             </div>
         </div>
