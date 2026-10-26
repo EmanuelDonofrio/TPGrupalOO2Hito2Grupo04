@@ -1,8 +1,11 @@
 package com.epicentroGourmet.services.implementation;
 import com.epicentroGourmet.entities.Plato;
 import com.epicentroGourmet.entities.UnidadVenta;
+import com.epicentroGourmet.entities.Empleado;
+import com.epicentroGourmet.repositories.IEmpleadoRepository;
 import com.epicentroGourmet.repositories.IPlatoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -10,9 +13,11 @@ import java.util.List;
 public class PlatoService {
 
     private final IPlatoRepository platoRepository;
+    private final IEmpleadoRepository empleadoRepository;
 
-    public PlatoService(IPlatoRepository platoRepository) {
+    public PlatoService(IPlatoRepository platoRepository, IEmpleadoRepository empleadoRepository) {
         this.platoRepository = platoRepository;
+        this.empleadoRepository = empleadoRepository;
     }
 
     public List<Plato> obtenerPorUnidadVenta(UnidadVenta unidadVenta) {
@@ -21,5 +26,21 @@ public class PlatoService {
             return List.of();
         }
         return platoRepository.findByUnidadVenta(unidadVenta);
+    }
+
+    @Transactional
+    public void crear(Plato plato, String usernameResponsable) {
+        Empleado responsable = empleadoRepository.findByUsuarioUsername(usernameResponsable)
+                .orElseThrow(() -> new IllegalStateException(
+                        "No existe un empleado asociado al usuario " + usernameResponsable));
+
+        UnidadVenta unidadVenta = responsable.getUnidadVentaACargo();
+        if (unidadVenta == null) {
+            throw new IllegalStateException(
+                    "El responsable no tiene una unidad de venta asignada.");
+        }
+
+        Plato platoGuardado = platoRepository.save(plato);
+        unidadVenta.getMenu().add(platoGuardado);
     }
 }

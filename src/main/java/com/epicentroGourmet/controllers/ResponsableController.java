@@ -67,7 +67,7 @@ public class ResponsableController {
 
     @GetMapping("/empleados/nuevo")
     public ModelAndView crearEmpleado() {
-        ModelAndView modelAndView = new ModelAndView("empleado/nuevo");
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.EMPLEADO_NUEVO);
         modelAndView.addObject("empleado", new EmpleadoDTOForm());
         modelAndView.addObject("especialidades", Cocinero.EspecialidadCocinaEnum.values());
         modelAndView.addObject("turnos", Cajero.turnoEnum.values());
@@ -80,7 +80,7 @@ public class ResponsableController {
                                         RedirectAttributes redirectAttributes,
                                         Authentication authentication) {
 
-        ModelAndView modelAndView = new ModelAndView("empleado/nuevo");
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.EMPLEADO_NUEVO);
         modelAndView.addObject("especialidades", Cocinero.EspecialidadCocinaEnum.values());
         modelAndView.addObject("turnos", Cajero.turnoEnum.values());
 
@@ -113,5 +113,31 @@ public class ResponsableController {
         modelAndView.addObject("platos", platos);
         return modelAndView;
     }
+
+
+    @GetMapping("/platos/nuevo")
+    public ModelAndView crearPlato() {
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.PLATO_NUEVO);
+        modelAndView.addObject("plato", new Plato());
+        return modelAndView;
+    }
+
+    @PostMapping("/platos/create")
+    public ModelAndView guardarPlato(@Valid @ModelAttribute("plato") Plato plato,
+                                        BindingResult bindingResult,
+                                        RedirectAttributes redirectAttributes,
+                                        Authentication authentication) {
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.PLATO_NUEVO);
+
+        if (bindingResult.hasErrors()) {
+            return modelAndView;
+        }
+
+        platoService.crear(plato, authentication.getName());
+        redirectAttributes.addFlashAttribute("mensaje", "Plato creado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
+    }
+
 
 }
