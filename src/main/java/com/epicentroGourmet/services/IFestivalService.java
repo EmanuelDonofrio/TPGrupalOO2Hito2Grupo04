@@ -7,4 +7,5 @@ import java.util.List;
 public interface IFestivalService {
 
     List<Festival> getAll();
+    List<Festival> traerFestivalesPorUnidad(Long idUnidad);
 }
