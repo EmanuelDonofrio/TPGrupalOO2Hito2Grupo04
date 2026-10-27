@@ -27,13 +27,16 @@ public class EmpleadoService {
     private final IUserRepository userRepository;
     private final IUserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public EmpleadoService(IEmpleadoRepository empleadoRepository, IUserRepository userRepository,
-                           IUserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder) {
+                           IUserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder,
+                           EmailService emailService) {
         this.empleadoRepository = empleadoRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     public Empleado obtenerEmpleado(String username) {
@@ -130,6 +133,19 @@ public class EmpleadoService {
 
         empleado.setUnidadVentaACargo(unidadVenta);
         user.setEmpleado(empleado);
+
+        //ENVIO DE MAIL
+        emailService.enviarMail(
+                "TP_OO2_GRUPO04@gmail.com",
+                "aza004aa@gmail.com",
+                "Epicentro Gourmet - Credenciales de acceso",
+                "Hola " + form.getNombre() + " " + form.getApellido() + ",\n\n"
+                + "¡Te damos la bienvenida a Epicentro Gourmet!\n\n"
+                + "Tu cuenta fue dada de alta en el sistema. A continuación, "
+                + "encontrarás tus datos de acceso:\n\n"
+                + "  Usuario: " + form.getUsername() + "\n"
+                + "  Contraseña: " + form.getPassword() + "\n\n"
+        );
 
         return empleadoRepository.save(empleado);
 

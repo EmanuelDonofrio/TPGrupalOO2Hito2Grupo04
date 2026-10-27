@@ -5,9 +5,11 @@ import com.epicentroGourmet.entities.Cocinero;
 import com.epicentroGourmet.entities.Empleado;
 import com.epicentroGourmet.entities.Plato;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
+import com.epicentroGourmet.services.implementation.EmailService;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import com.epicentroGourmet.services.implementation.PlatoService;
 import jakarta.validation.Valid;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -88,6 +90,7 @@ public class ResponsableController {
             return modelAndView;
         }
 
+
         empleadoService.crear(form, authentication.getName());
         redirectAttributes.addFlashAttribute("mensaje", "Empleado creado correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
@@ -113,7 +116,6 @@ public class ResponsableController {
         modelAndView.addObject("platos", platos);
         return modelAndView;
     }
-
 
     @GetMapping("/platos/nuevo")
     public ModelAndView crearPlato() {
