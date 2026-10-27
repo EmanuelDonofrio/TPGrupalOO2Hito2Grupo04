@@ -45,17 +45,39 @@ public class PlatoService {
     }
 
     @Transactional
+    public void modificar(Long id, Plato datos, String usernameResponsable) {
+        UnidadVenta unidadVenta = obtenerUnidadVentaResponsable(usernameResponsable);
+        Plato plato = obtenerPlatoDeUnidad(id, unidadVenta);
+
+        plato.setNombre(datos.getNombre());
+        plato.setPrecioVenta(datos.getPrecioVenta());
+        plato.setPrecioCosto(datos.getPrecioCosto());
+        platoRepository.save(plato);
+    }
+
+    @Transactional
     public void eliminar(Long id, String usernameResponsable) {
+        UnidadVenta unidadVenta = obtenerUnidadVentaResponsable(usernameResponsable);
+        Plato plato = obtenerPlatoDeUnidad(id, unidadVenta);
+
+        unidadVenta.getMenu().removeIf(platoMenu ->
+                platoMenu.getIdPlato().equals(plato.getIdPlato()));
+        platoRepository.delete(plato);
+    }
+
+    private UnidadVenta obtenerUnidadVentaResponsable(String usernameResponsable) {
         Empleado responsable = empleadoRepository.findByUsuarioUsername(usernameResponsable)
                 .orElseThrow(() -> new IllegalStateException(
                         "No existe un empleado asociado al usuario " + usernameResponsable));
 
-        UnidadVenta unidadVenta = responsable.getUnidadVentaACargo();
-        if (unidadVenta == null) {
+        if (responsable.getUnidadVentaACargo() == null) {
             throw new IllegalStateException(
                     "El responsable no tiene una unidad de venta asignada.");
         }
+        return responsable.getUnidadVentaACargo();
+    }
 
+    private Plato obtenerPlatoDeUnidad(Long id, UnidadVenta unidadVenta) {
         Plato plato = platoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No existe un plato con el ID " + id + "."));
@@ -66,9 +88,6 @@ public class PlatoService {
             throw new IllegalArgumentException(
                     "El plato no pertenece a la unidad de venta del responsable.");
         }
-
-        unidadVenta.getMenu().removeIf(platoMenu ->
-                platoMenu.getIdPlato().equals(plato.getIdPlato()));
-        platoRepository.delete(plato);
+        return plato;
     }
 }
