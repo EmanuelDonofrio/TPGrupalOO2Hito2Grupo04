@@ -13,18 +13,15 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.epicentroGourmet.helpers.ViewRouteHelper;
-import com.epicentroGourmet.services.implementation.UnidadVentaService;
 
 @Controller
 @RequestMapping("/")
 public class HomeController {
 
 	private final IFestivalService festivalService;
-	private final UnidadVentaService unidadVentaService;
 
-	public HomeController(IFestivalService festivalService,UnidadVentaService unidadVentaService) {
+	public HomeController(IFestivalService festivalService) {
 		this.festivalService = festivalService;
-		this.unidadVentaService = unidadVentaService;
 	}
 
 	// PORTADA (al iniciar)
@@ -50,14 +47,5 @@ public class HomeController {
 		return modelAndView;
 	}
 
-
-
-	// VISTA PRINCIPAL ADMINISTRADOR
-	@GetMapping("/admin/festivales")
-	public ModelAndView verHomeAdmin() {
-		ModelAndView mav = new ModelAndView("home/home_admin");
-		mav.addObject("unidades", unidadVentaService.listarTodas());
-		return mav;
-	}
 	
 }

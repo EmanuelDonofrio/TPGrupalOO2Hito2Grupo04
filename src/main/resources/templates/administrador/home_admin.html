@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+    <main class="container py-4">
+        <!-- Encabezado -->
+        <div class="row align-items-center mb-5 pb-3 border-bottom">
+            <div class="col-md-7">
+                <h1 class="display-5 fw-bold text-dark">Gestión de Festivales</h1>
+                <p class="lead text-muted">
+                    Administra los festivales registrados en Epicentro Gourmet.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sección de Festivales -->
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                <h4 class="mb-0 fs-5">Festivales</h4>
+
+                <span class="badge bg-primary"
+                    th:text="${festivales != null ? festivales.size() : 0} + ' Registrados'">
+                    0 Registrados
+                </span>
+            </div>
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-striped mb-0 align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">ID</th>
+                                <th>Nombre</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Fin</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="festival : ${festivales}">
+
+                                <td class="ps-4 fw-semibold"
+                                    th:text="${festival.idFestival}">
+                                    1
+                                </td>
+
+                                <td class="fw-semibold text-primary"
+                                    th:text="${festival.nombre}">
+                                    Festival Gastronómico
+                                </td>
+
+                                <td th:text="${#temporals.format(festival.fechaInicio, 'dd/MM/yyyy')}">
+                                    15/01/2026
+                                </td>
+
+                                <td th:text="${#temporals.format(festival.fechaFin, 'dd/MM/yyyy')}">
+                                    20/01/2026
+                                </td>
+
+                                <td>
+                                    <a th:href="@{/administrador/{id}/unidades(id=${festival.idFestival})}"
+                                    class="btn btn-sm btn-outline-primary me-2">
+                                        Ver Unidades de Venta
+                                    </a>
+
+                                    <a th:href="@{/administrador/{id}/editar(id=${festival.idFestival})}"
+                                    class="btn btn-sm btn-outline-primary me-2">
+                                        Editar
+                                    </a>
+
+                                    <a th:href="@{/administrador/{id}/eliminar(id=${festival.idFestival})}"
+                                    class="btn btn-sm btn-outline-danger">
+                                        Eliminar
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            <!-- Mensaje cuando no hay festivales -->
+                            <tr th:if="${festivales == null or #lists.isEmpty(festivales)}">
+
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No se encontraron festivales registrados.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+    <footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

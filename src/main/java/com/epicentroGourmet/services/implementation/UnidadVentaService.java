@@ -107,4 +107,8 @@ public class UnidadVentaService implements IUnidadVentaService {
     public List<UnidadVenta> listarTodas() {
         return unidadVentaRepository.findAll();
     }
+
+    public List<UnidadVenta> listarPorFestival(Long idFestival){
+        return unidadVentaRepository.findByFestivales_IdFestival(idFestival);
+    }
 }

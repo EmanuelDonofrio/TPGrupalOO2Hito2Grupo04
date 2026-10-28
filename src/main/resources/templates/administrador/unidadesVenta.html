@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+
+<body>
+
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+
+    <!-- Encabezado -->
+    <div class="row align-items-center mb-5 pb-3 border-bottom">
+        <div class="col-md-7">
+            <h1 class="display-5 fw-bold text-dark">Gestión de Unidades de Venta</h1>
+            <p class="lead text-muted">
+                Administra las unidades de venta registradas en Epicentro Gourmet.
+            </p>
+        </div>
+    </div>
+
+    <!--  Botonera  -->
+    <button type="button"
+            class="btn btn-success"
+            data-toggle="modal"
+            data-target="#modalAgregarUnidad">
+        <i class="bi bi-plus-circle me-1"></i>
+        Agregar unidad de venta
+    </button>
+
+    <!-- Sección de Unidades de Venta -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+
+            <h4 class="mb-0 fs-5">Unidades de Venta</h4>
+
+            <span class="badge bg-primary"
+                  th:text="${unidades != null ? unidades.size() : 0} + ' Registradas'">
+                0 Registradas
+            </span>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover table-striped mb-0 align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Nombre</th>
+                            <th>Responsable</th>
+                            <th>Acciones</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="u : ${unidades}">
+
+                            <td class="ps-4 fw-semibold"
+                                th:text="${u.idUnidadVenta}">
+                                1
+                            </td>
+
+                            <td class="fw-semibold text-primary"
+                                th:text="${u.nombre}">
+                                Unidad de Venta
+                            </td>
+
+                            <td th:text="${u.responsable}">
+                                Responsable
+                            </td>
+
+                            <td>
+
+                                <a th:href="@{/admin/unidades-venta/{id}/editar(id=${u.idUnidadVenta})}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Editar
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        <!-- Mensaje cuando no hay unidades -->
+                        <tr th:if="${unidades == null or #lists.isEmpty(unidades)}">
+
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                No se encontraron unidades de venta registradas.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modal para agregar unidad de venta -->
+    
+    <div class="modal fade"
+        id="modalAgregarUnidad"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="modalAgregarUnidadLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered" role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title" id="modalAgregarUnidadLabel">
+                        Agregar unidad de venta
+                    </h5>
+
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p>¿Cómo querés agregar la unidad de venta?</p>
+
+                    <div class="d-grid gap-3">
+
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                data-dismiss="modal"
+                                onclick="seleccionarUnidadExistente()">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            Seleccionar una existente
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-success"
+                                data-dismiss="modal"
+                                onclick="crearUnidadNueva()">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Crear una nueva
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    
+    
+    <script>
+        function seleccionarUnidadExistente() {
+            alert("Próximo paso: seleccionar una unidad existente.");
+        }
+
+        function crearUnidadNueva() {
+            alert("Próximo paso: abrir el formulario de registro.");
+        }
+    </script>
+
+
+
+
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+
+</body>
+</html>
