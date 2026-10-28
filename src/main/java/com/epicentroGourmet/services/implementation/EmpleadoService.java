@@ -218,16 +218,20 @@ public class EmpleadoService {
         }
 
         UnidadVenta unidadVentaReal = Hibernate.unproxy(unidadVenta, UnidadVenta.class);
+        Festival festival = unidadVenta.getFestivales().stream()
+                .findFirst() //Teniendo en cuenta que solo hay un unico festival como dice la consigna
+                .orElse(null);
 
-        double canon = 0.0;
+        //De base se arranca con este valor, luego se suma dependiendo la superficie que usa, si usa conex electrica, montaje
+        double canon = festival.getCosto().getCostoBase();
 
         if (unidadVentaReal instanceof FoodTruck foodTruck) {
-            canon = foodTruck.getSuperficie() * 500.0;
+            canon += foodTruck.getSuperficie() * festival.getCosto().getCostoSuperficie();
             if (foodTruck.isConexionElectrica()) {
-                canon += 2000.0;
+                canon += festival.getCosto().getCostoElectricidad();
             }
         } else if (unidadVentaReal instanceof PuestoDesarmable puestoDesarmable) {
-            canon =  (puestoDesarmable.getSuperficie() * 500.0) - (puestoDesarmable.getTiempoMontaje() * 10.0);
+            canon +=  (puestoDesarmable.getSuperficie() *  festival.getCosto().getCostoSuperficie()) - (puestoDesarmable.getTiempoMontaje() *  festival.getCosto().getCostoMontaje());
         }
 
         return canon;
