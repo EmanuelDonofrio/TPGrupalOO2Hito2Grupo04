@@ -67,8 +67,15 @@
                                 <td>
                                     <a th:href="@{/administrador/{id}/unidades(id=${festival.idFestival})}"
                                     class="btn btn-sm btn-outline-primary me-2">
-                                        Ver Unidades de Venta
+                                        Ver Unidades
                                     </a>
+
+                                    
+                                    <a th:href="@{/administrador/{id}/ranking(id=${festival.idFestival})}"
+                                    class="btn btn-sm btn-outline-success">
+                                        Ver ranking
+                                    </a>
+
 
                                     <a th:href="@{/administrador/{id}/editar(id=${festival.idFestival})}"
                                     class="btn btn-sm btn-outline-primary me-2">

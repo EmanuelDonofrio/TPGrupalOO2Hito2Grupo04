@@ -15,6 +15,7 @@ import com.epicentroGourmet.services.IUnidadVentaService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.epicentroGourmet.repositories.RankingUnidadProjection;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -111,4 +112,11 @@ public class UnidadVentaService implements IUnidadVentaService {
     public List<UnidadVenta> listarPorFestival(Long idFestival){
         return unidadVentaRepository.findByFestivales_IdFestival(idFestival);
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<RankingUnidadProjection> obtenerRankingPorFestival(Long idFestival) {
+        return unidadVentaRepository.obtenerRankingPorFestival(idFestival);
+    }
+
 }

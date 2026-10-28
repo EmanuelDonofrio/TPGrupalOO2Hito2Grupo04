@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+
+<body>
+
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+
+    <!-- Encabezado -->
+    <div class="row align-items-center mb-4 pb-3 border-bottom">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-dark">
+                Ranking de Unidades de Venta
+            </h1>
+
+            <p class="lead text-muted mb-0">
+                Recaudación de las unidades asociadas al festival.
+            </p>
+        </div>
+    </div>
+
+    <!-- Información del festival -->
+    <div class="alert alert-info mb-4">
+        <strong>Festival:</strong>
+        <span th:text="${festival.nombre}">Nombre del festival</span>
+    </div>
+
+    <!-- Grilla del ranking -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-dark text-white py-3">
+            <h4 class="mb-0 fs-5">Ranking por recaudación</h4>
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Posición</th>
+                            <th>Unidad de venta</th>
+                            <th class="text-end pe-4">Recaudación</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="unidad, iterStat : ${ranking}">
+
+                            <td class="ps-4">
+                                <span th:text="${iterStat.count}">1</span>
+                                <span th:if="${iterStat.count == 1}">🥇</span>
+                                <span th:if="${iterStat.count == 2}">🥈</span>
+                                <span th:if="${iterStat.count == 3}">🥉</span>
+                            </td>
+
+                            <td class="fw-semibold"
+                                th:text="${unidad.nombre}">
+                                Nombre de la unidad
+                            </td>
+
+                            <td class="text-end pe-4 fw-bold text-success"
+                                th:text="${#numbers.formatDecimal(unidad.recaudacion, 1, 'POINT', 2, 'COMMA')}">
+                                125.000,00
+                            </td>
+
+                        </tr>
+
+                        <tr th:if="${ranking == null or #lists.isEmpty(ranking)}">
+                            <td colspan="3" class="text-center py-4 text-muted">
+                                No hay unidades de venta para mostrar en el ranking.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Botón volver -->
+    <div class="mt-4">
+        <a th:href="@{/admin/festivales}"
+           class="btn btn-outline-secondary">
+            Volver a festivales
+        </a>
+    </div>
+
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+<div th:replace="~{layout :: scripts}"></div>
+
+</body>
+</html>
