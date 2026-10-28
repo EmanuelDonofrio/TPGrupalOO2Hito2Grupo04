@@ -1,49 +1,150 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: head}"></head>
+<style>
+    .reports-page {
+        background: #f4f6f8;
+        min-height: calc(100vh - 120px);
+    }
+
+    .reports-title {
+        color: #2c3e50;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .report-card {
+        border: 1px solid #e1e5e9;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(44, 62, 80, 0.08);
+        overflow: hidden;
+    }
+
+    .report-card-header {
+        background: #34495e;
+        color: #ffffff;
+        padding: 1.15rem 1.4rem;
+    }
+
+    .report-card-header.revenue {
+        background: #536878;
+    }
+
+    .report-card-body {
+        background: #ffffff;
+        padding: 1.5rem;
+    }
+
+    .data-row {
+        align-items: center;
+        border-bottom: 1px solid #edf0f2;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 0;
+    }
+
+    .data-row:first-child {
+        padding-top: 0;
+    }
+
+    .data-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .data-label {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .data-value {
+        color: #2c3e50;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .amount {
+        color: #345b70;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    @media (max-width: 575.98px) {
+        .data-row {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .data-value {
+            text-align: left;
+        }
+    }
+</style>
 
 <body>
 
 <nav th:replace="~{layout :: navbar}"></nav>
 
-<main class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Cálculos y reportes</h2>
+<main class="reports-page">
+    <div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
+        <div>
+            <p class="text-uppercase text-muted small fw-bold mb-1">Panel del responsable</p>
+            <h2 class="reports-title mb-0">Cálculos y reportes</h2>
+        </div>
         <a th:href="@{/responsable/}" class="btn btn-outline-secondary">Volver al panel</a>
     </div>
 
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="h5 mb-0">Datos de la unidad</h3>
+    <div class="row g-4 align-items-stretch">
+        <div class="col-lg-6">
+            <div class="report-card h-100">
+                <div class="report-card-header">
+                    <h3 class="h5 mb-1">Datos de la unidad</h3>
+                    <p class="small mb-0 opacity-75">Información y canon estimado</p>
                 </div>
-                <div class="card-body">
-                    <p class="mb-2"><strong>Unidad:</strong> <span th:text="${unidadVentaACargo != null ? unidadVentaACargo.nombre : 'Sin asignación'}">Unidad</span></p>
-                    <p class="mb-2"><strong>Código:</strong> <span th:text="${unidadVentaACargo != null ? unidadVentaACargo.codigo : '---'}">Código</span></p>
-                    <p class="mb-2"><strong>Superficie:</strong> <span th:text="${unidadVentaACargo != null ? unidadVentaACargo.superficie : '---'}">Superficie</span></p>
-                    <p class="mb-0"><strong>Cánon estimado:</strong> $<span th:text="${#numbers.formatDecimal(canon, 1, 2)}">0.00</span></p>
+                <div class="report-card-body">
+                    <div class="data-row">
+                        <span class="data-label">Unidad</span>
+                        <span class="data-value" th:text="${unidadVentaACargo != null ? unidadVentaACargo.nombre : 'Sin asignación'}">Unidad</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Código</span>
+                        <span class="data-value" th:text="${unidadVentaACargo != null ? unidadVentaACargo.codigo : '---'}">Código</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Superficie</span>
+                        <span class="data-value" th:text="${unidadVentaACargo != null ? unidadVentaACargo.superficie : '---'}">Superficie</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Canon estimado</span>
+                        <span class="data-value amount">$<span th:text="${#numbers.formatDecimal(canon, 1, 2)}">0.00</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="report-card h-100">
+                <div class="report-card-header revenue">
+                    <h3 class="h5 mb-1">Reporte de recaudación</h3>
+                    <p class="small mb-0 opacity-75">Resumen de ventas del festival</p>
+                </div>
+                <div class="report-card-body">
+                    <div class="data-row">
+                        <span class="data-label">Festival</span>
+                        <span class="data-value" th:text="${reporteVenta.nombreFestival}">Sin festival asignado</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recaudación total</span>
+                        <span class="data-value amount">$<span th:text="${#numbers.formatDecimal(reporteVenta.recaudacionTotal, 1, 2)}">0.00</span></span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="h5 mb-0">Reporte de recaudacion</h3>
-                </div>
-                <div class="card-body">
-                    <p class="mb-2"><strong>Festival:</strong>
-                        <span th:text="${reporteVenta.nombreFestival}">Sin festival asignado</span>
-                    </p>
-                    <p class="mb-0"><strong>Recaudación total:</strong>
-                        $<span th:text="${#numbers.formatDecimal(reporteVenta.recaudacionTotal, 1, 2)}">0.00</span>
-                    </p>
-                </div>
-            </div>
-        </div>
+    </div>
 </main>
 
 <footer th:replace="~{layout :: footer}"></footer>
