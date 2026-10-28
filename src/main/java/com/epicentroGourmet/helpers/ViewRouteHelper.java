@@ -16,6 +16,7 @@ public class ViewRouteHelper {
 
 	// RESPONSABLE
 	public final static String RESPONSABLE_EMPLEADOS = "responsable/empleados";
+	public final static String RESPONSABLE_EMPLEADOS_DESHABILITADOS = "responsable/empleadosDeshabilitados";
 	public final static String RESPONSABLE_INICIO = "responsable/inicio";
 	public final static String RESPONSABLE_PLATOS = "responsable/platos";
 	public final static String RESPONSABLE_CALCULOS = "responsable/calculosyreportes";
@@ -31,6 +32,8 @@ public class ViewRouteHelper {
 	public final static String ROUTE = "/index";
 	public final static String ROUTE_ADMIN_FESTIVALES = "redirect:/admin/festivales";
 	public final static String ROUTE_RESPONSABLE_EMPLEADOS = "redirect:/responsable/empleados";
+	public final static String ROUTE_RESPONSABLE_EMPLEADOS_DESHABILITADOS =
+			"redirect:/responsable/empleadosDeshabilitados";
 	public final static String ROUTE_EMPLEADO_PERFIL = "redirect:/empleado/mi-informacion";
 	public final static String ROUTE_RESPONSABLE_PLATOS = "redirect:/responsable/platos";
 	public final static String ROUTE_RESPONSABLE_CALCULOS = "redirect:/responsable/calculosyreportes";

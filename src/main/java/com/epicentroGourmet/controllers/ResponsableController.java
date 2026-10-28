@@ -41,7 +41,7 @@ public class ResponsableController {
         Empleado empleado = empleadoService.obtenerEmpleado(authentication.getName());
 
         List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(
-                empleado.getUnidadVentaACargo());
+                empleado.getUnidadVentaACargo(), true);
 
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_INICIO);
 
@@ -62,9 +62,20 @@ public class ResponsableController {
     public ModelAndView verEmpleados(Authentication authentication) {
         Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
         List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(
-                responsable.getUnidadVentaACargo());
+                responsable.getUnidadVentaACargo(), true);
 
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
+        modelAndView.addObject("empleados", empleados);
+        return modelAndView;
+    }
+
+    @GetMapping("/empleadosDeshabilitados")
+    public ModelAndView verEmpleadosDeshabilitados(Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(
+                responsable.getUnidadVentaACargo(), false);
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS_DESHABILITADOS);
         modelAndView.addObject("empleados", empleados);
         return modelAndView;
     }
@@ -93,7 +104,13 @@ public class ResponsableController {
         }
 
 
-        empleadoService.crear(form, authentication.getName());
+        try {
+            empleadoService.crear(form, authentication.getName());
+        } catch (IllegalArgumentException exception) {
+            modelAndView.addObject("error", exception.getMessage());
+            return modelAndView;
+        }
+
         redirectAttributes.addFlashAttribute("mensaje", "Empleado creado correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
     }
@@ -103,8 +120,19 @@ public class ResponsableController {
                                          RedirectAttributes redirectAttributes) {
         empleadoService.eliminar(id);
         redirectAttributes.addFlashAttribute("mensaje",
-                "Empleado habilitado correctamente.");
+                "Empleado dado de baja correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
+    }
+
+    @PostMapping("/empleados/alta/{id}")
+    public ModelAndView altaEmpleado(@PathVariable("id") Long id,
+                                         RedirectAttributes redirectAttributes) {
+
+        empleadoService.habilitar(id);
+
+        redirectAttributes.addFlashAttribute("mensaje",
+                "Empleado habilitado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS_DESHABILITADOS);
     }
 
 

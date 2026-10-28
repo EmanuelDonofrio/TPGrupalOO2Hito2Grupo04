@@ -14,10 +14,16 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service("empleadoService")
 public class EmpleadoService {
+
+    private static final String CARACTERES_CONTRASENA =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int LONGITUD_CONTRASENA = 10;
+    private final SecureRandom generadorAleatorio = new SecureRandom();
 
     private final IEmpleadoRepository empleadoRepository;
     private final IUserRepository userRepository;
@@ -43,19 +49,58 @@ public class EmpleadoService {
 
     }
 
-    public List<Empleado> obtenerPorUnidadVenta(UnidadVenta unidadVenta) {
+    public List<Empleado> obtenerPorUnidadVenta(UnidadVenta unidadVenta, boolean enabled) {
         if (unidadVenta == null) {
             return List.of();
         }
         return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
-                unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, true);
+                unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled);
+    }
+
+    public String generarContrasenaAleatoria() {
+        StringBuilder contrasena = new StringBuilder(LONGITUD_CONTRASENA);
+
+        for (int i = 0; i < LONGITUD_CONTRASENA; i++) {
+            int indice = generadorAleatorio.nextInt(CARACTERES_CONTRASENA.length());
+            contrasena.append(CARACTERES_CONTRASENA.charAt(indice));
+        }
+
+        return contrasena.toString();
     }
 
     @Transactional
     public Empleado crear(EmpleadoDTOForm form, String usernameResponsable) {
 
+        if (form == null) {
+            throw new IllegalArgumentException("Los datos del empleado son obligatorios.");
+        }
+
         if (userRepository.existsByUsername(form.getUsername())) {
             throw new IllegalArgumentException("El username ya está en uso.");
+        }
+
+        LocalDate fechaActual = LocalDate.now();
+
+        if (form.getFechaIngreso() == null
+                || form.getFechaIngreso().isAfter(fechaActual)) {
+            throw new IllegalArgumentException(
+                    "La fecha de ingreso no puede ser nula ni futura.");
+        }
+
+        if (form.getFechaNacimiento() == null
+                || form.getFechaNacimiento().isAfter(fechaActual)) {
+            throw new IllegalArgumentException(
+                    "La fecha de nacimiento no puede ser nula ni futura.");
+        }
+
+        if (Period.between(form.getFechaNacimiento(), fechaActual).getYears() < 18) {
+            throw new IllegalArgumentException(
+                    "El empleado debe ser mayor de 18 años.");
+        }
+
+        if (form.getFechaIngreso().isBefore(form.getFechaNacimiento())) {
+            throw new IllegalArgumentException(
+                    "La fecha de ingreso no puede ser anterior a la fecha de nacimiento.");
         }
 
         Empleado responsable = obtenerEmpleado(usernameResponsable);
@@ -66,16 +111,13 @@ public class EmpleadoService {
                     "El responsable no tiene una unidad de venta asignada.");
         }
 
-        if (form.getFechaIngreso() == null || form.getFechaIngreso().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("La fecha de ingreso no puede ser nula ni futura.");
-        }
-
         UserRole userRole = userRoleRepository.findByRole(UserRole.RolEnum.ROLE_EMPLEADO)
                 .orElseThrow(() -> new IllegalStateException(
                         "No existe el registro de user_role ROLE_EMPLEADO."));
 
+        String contrasena = generarContrasenaAleatoria();
         User user = userRepository.save(
-                new User(form.getUsername(), passwordEncoder.encode(form.getPassword()), true, userRole));
+                new User(form.getUsername(), passwordEncoder.encode(contrasena), true, userRole));
 
         Empleado empleado;
         int antiguedad = Period.between(form.getFechaIngreso(), LocalDate.now()).getYears();
@@ -123,7 +165,7 @@ public class EmpleadoService {
                 + "Tu cuenta fue dada de alta en el sistema. A continuación, "
                 + "encontrarás tus datos de acceso:\n\n"
                 + "  Usuario: " + form.getUsername() + "\n"
-                + "  Contraseña: " + form.getPassword() + "\n\n"
+                + "  Contraseña: " + contrasena + "\n\n"
         );
 
         return empleadoRepository.save(empleado);
@@ -138,6 +180,17 @@ public class EmpleadoService {
 
         empleado.getUsuario().setEnabled(false);
         userRepository.save(empleado.getUsuario());
+        return true;
+    }
+
+    public boolean habilitar(Long id) {
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException());
+
+        empleado.getUsuario().setEnabled(true);
+
+        userRepository.save(empleado.getUsuario());
+
         return true;
     }
 
