@@ -41,13 +41,13 @@
                            class="btn btn-sm btn-warning">
                             Modificar
                         </a>
-                        <form th:action="@{/responsable/platos/eliminar/{id}(id=${plato.idPlato})}"
-                              method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('¿Eliminar este plato?');">
-                                Eliminar
-                            </button>
-                        </form>
+<!--                        <form th:action="@{/responsable/platos/eliminar/{id}(id=${plato.idPlato})}"-->
+<!--                              method="post" class="d-inline">-->
+<!--                            <button type="submit" class="btn btn-sm btn-danger"-->
+<!--                                    onclick="return confirm('¿Eliminar este plato?');">-->
+<!--                                Eliminar-->
+<!--                            </button>-->
+<!--                        </form>-->
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(platos)}">

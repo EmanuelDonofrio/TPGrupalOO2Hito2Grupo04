@@ -14,10 +14,16 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service("empleadoService")
 public class EmpleadoService {
+
+    private static final String CARACTERES_CONTRASENA =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int LONGITUD_CONTRASENA = 10;
+    private final SecureRandom generadorAleatorio = new SecureRandom();
 
     private final IEmpleadoRepository empleadoRepository;
     private final IUserRepository userRepository;
@@ -49,6 +55,17 @@ public class EmpleadoService {
         }
         return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
                 unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, true);
+    }
+
+    public String generarContrasenaAleatoria() {
+        StringBuilder contrasena = new StringBuilder(LONGITUD_CONTRASENA);
+
+        for (int i = 0; i < LONGITUD_CONTRASENA; i++) {
+            int indice = generadorAleatorio.nextInt(CARACTERES_CONTRASENA.length());
+            contrasena.append(CARACTERES_CONTRASENA.charAt(indice));
+        }
+
+        return contrasena.toString();
     }
 
     @Transactional
@@ -98,8 +115,9 @@ public class EmpleadoService {
                 .orElseThrow(() -> new IllegalStateException(
                         "No existe el registro de user_role ROLE_EMPLEADO."));
 
+        String contrasena = generarContrasenaAleatoria();
         User user = userRepository.save(
-                new User(form.getUsername(), passwordEncoder.encode(form.getPassword()), true, userRole));
+                new User(form.getUsername(), passwordEncoder.encode(contrasena), true, userRole));
 
         Empleado empleado;
         int antiguedad = Period.between(form.getFechaIngreso(), LocalDate.now()).getYears();
@@ -147,7 +165,7 @@ public class EmpleadoService {
                 + "Tu cuenta fue dada de alta en el sistema. A continuación, "
                 + "encontrarás tus datos de acceso:\n\n"
                 + "  Usuario: " + form.getUsername() + "\n"
-                + "  Contraseña: " + form.getPassword() + "\n\n"
+                + "  Contraseña: " + contrasena + "\n\n"
         );
 
         return empleadoRepository.save(empleado);
