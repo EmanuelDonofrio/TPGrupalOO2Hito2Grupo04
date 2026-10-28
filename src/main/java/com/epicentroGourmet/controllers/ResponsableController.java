@@ -93,7 +93,13 @@ public class ResponsableController {
         }
 
 
-        empleadoService.crear(form, authentication.getName());
+        try {
+            empleadoService.crear(form, authentication.getName());
+        } catch (IllegalArgumentException exception) {
+            modelAndView.addObject("error", exception.getMessage());
+            return modelAndView;
+        }
+
         redirectAttributes.addFlashAttribute("mensaje", "Empleado creado correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
     }

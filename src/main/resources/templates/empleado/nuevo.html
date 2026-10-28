@@ -7,6 +7,10 @@
 <main class="container py-4">
     <h1 class="mb-4">Nuevo empleado</h1>
 
+    <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}">
+        Error al crear el empleado.
+    </div>
+
     <form th:action="@{/responsable/empleados/create}" th:object="${empleado}" method="post">
         <div class="card mb-4">
             <div class="card-header">Datos de acceso</div>

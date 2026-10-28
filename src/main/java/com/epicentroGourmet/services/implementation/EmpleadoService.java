@@ -54,8 +54,36 @@ public class EmpleadoService {
     @Transactional
     public Empleado crear(EmpleadoDTOForm form, String usernameResponsable) {
 
+        if (form == null) {
+            throw new IllegalArgumentException("Los datos del empleado son obligatorios.");
+        }
+
         if (userRepository.existsByUsername(form.getUsername())) {
             throw new IllegalArgumentException("El username ya está en uso.");
+        }
+
+        LocalDate fechaActual = LocalDate.now();
+
+        if (form.getFechaIngreso() == null
+                || form.getFechaIngreso().isAfter(fechaActual)) {
+            throw new IllegalArgumentException(
+                    "La fecha de ingreso no puede ser nula ni futura.");
+        }
+
+        if (form.getFechaNacimiento() == null
+                || form.getFechaNacimiento().isAfter(fechaActual)) {
+            throw new IllegalArgumentException(
+                    "La fecha de nacimiento no puede ser nula ni futura.");
+        }
+
+        if (Period.between(form.getFechaNacimiento(), fechaActual).getYears() < 18) {
+            throw new IllegalArgumentException(
+                    "El empleado debe ser mayor de 18 años.");
+        }
+
+        if (form.getFechaIngreso().isBefore(form.getFechaNacimiento())) {
+            throw new IllegalArgumentException(
+                    "La fecha de ingreso no puede ser anterior a la fecha de nacimiento.");
         }
 
         Empleado responsable = obtenerEmpleado(usernameResponsable);
@@ -64,10 +92,6 @@ public class EmpleadoService {
         if (unidadVenta == null) {
             throw new IllegalStateException(
                     "El responsable no tiene una unidad de venta asignada.");
-        }
-
-        if (form.getFechaIngreso() == null || form.getFechaIngreso().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("La fecha de ingreso no puede ser nula ni futura.");
         }
 
         UserRole userRole = userRoleRepository.findByRole(UserRole.RolEnum.ROLE_EMPLEADO)
