@@ -48,6 +48,44 @@
               <span class="fw-semibold text-success" th:text="'$' + ${#numbers.formatDecimal(empleado.sueldoBase, 1, 'POINT', 2, 'COMMA')}">$100.000,00</span>
             </div>
           </div>
+		  
+		  <!-- TRABAJO ACTUAL -->
+		  <h5 class="text-primary border-bottom pb-2 mb-3">
+		      Mi Trabajo Actual
+		  </h5>
+
+		  <div th:if="${festivalActual != null}"
+		       class="alert alert-success mb-4">
+
+		      <span class="badge bg-success mb-2">
+		          Festival en curso
+		      </span>
+
+		      <p class="mb-1">
+		          <strong>Festival:</strong>
+		          <span th:text="${festivalActual.nombre}"></span>
+		      </p>
+
+		      <p class="mb-1">
+		          <strong>Unidad de venta:</strong>
+		          <span th:text="${unidad.nombre}"></span>
+		      </p>
+
+		      <p class="mb-0">
+		          <strong>Período:</strong>
+		          <span th:text="${#temporals.format(festivalActual.fechaInicio, 'dd/MM/yyyy')}"></span>
+		          al
+		          <span th:text="${#temporals.format(festivalActual.fechaFin, 'dd/MM/yyyy')}"></span>
+		      </p>
+		  </div>
+
+		  <div th:if="${festivalActual == null}"
+		       class="alert alert-secondary mb-4">
+
+		      Actualmente no hay un festival vigente
+		      asociado a tu unidad de venta.
+
+		  </div>
 
           <!-- 3. UNIDAD DE VENTA ASIGNADA -->
           <h5 class="text-primary border-bottom pb-2 mb-3">Unidad de Venta Asignada</h5>
@@ -78,6 +116,8 @@
                 <th>Fecha Inicio</th>
                 <th>Fecha Fin</th>
                 <th>Unidad de Venta</th>
+				<th>Sueldo calculado</th>
+				<th>Recibo</th>
               </tr>
               </thead>
               <tbody>
@@ -87,9 +127,24 @@
                 <td th:text="${#temporals.format(fest.fechaInicio, 'dd/MM/yyyy')}">10/11/2026</td>
                 <td th:text="${#temporals.format(fest.fechaFin, 'dd/MM/yyyy')}">15/11/2026</td>
                 <td th:text="${unidad != null ? unidad.nombre : 'Sin asignar'}">Puesto Asignado</td>
+				<td class="fw-semibold text-success" th:text="${'$' + #numbers.formatDecimal(sueldosPorFestival[fest.idFestival], 1, 'POINT', 2, 'COMMA')}"> $0,00</td>
+				<td>
+				    <!-- Festival finalizado -->
+				    <a th:if="${fest.fechaFin != null and fest.fechaFin.isBefore(hoy)}"
+				       class="btn btn-sm btn-outline-primary"
+				       th:href="@{/empleado/recibo/{id}(id=${fest.idFestival})}">
+				        Descargar PDF
+				    </a>
+
+				    <!-- Festival actual o futuro -->
+				    <span th:unless="${fest.fechaFin != null and fest.fechaFin.isBefore(hoy)}"
+				          class="text-muted">
+				        No disponible
+				    </span>
+				</td>
               </tr>
               <tr th:if="${festivales == null or #lists.isEmpty(festivales)}">
-                <td colspan="5" class="text-center py-3 text-muted">
+                <td colspan="7" class="text-center py-3 text-muted">
                   No se registran festivales trabajados para la unidad actual.
                 </td>
               </tr>

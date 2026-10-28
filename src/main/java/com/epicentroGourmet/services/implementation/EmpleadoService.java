@@ -1,5 +1,6 @@
 package com.epicentroGourmet.services.implementation;
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
+import com.epicentroGourmet.entities.Festival;
 import com.epicentroGourmet.entities.Cajero;
 import com.epicentroGourmet.entities.Cocinero;
 import com.epicentroGourmet.entities.Empleado;
@@ -27,6 +28,11 @@ public class EmpleadoService {
     private final IUserRepository userRepository;
     private final IUserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private static final double SUELDO_BASE = 100000;
+    private static final double PLUS_ANTIGUEDAD = 5000;
+    private static final double PLUS_COCINERO = 150000;
+    private static final double PLUS_AYUDANTE = 100000;
+    private static final double PLUS_LAVAPLATOS = 50000;
     private final EmailService emailService;
 
     public EmpleadoService(IEmpleadoRepository empleadoRepository, IUserRepository userRepository,
@@ -85,47 +91,32 @@ public class EmpleadoService {
         int antiguedad = Period.between(form.getFechaIngreso(), LocalDate.now()).getYears();
 
         // LIQUIDACION DE HABERES
-        double plusAntiguedad = PoliticaSalarial.PLUS_ANTIGUEDAD;
-        double sueldoBase = PoliticaSalarial.SUELDO_BASE;
-
-        double sueldo = sueldoBase + (plusAntiguedad * antiguedad);
-
-        long cantidadDiasFestival = unidadVenta.getFestivales().stream()
-                .filter(festival -> festival.getFechaInicio() != null
-                        && festival.getFechaFin() != null)
-                .mapToLong(festival -> ChronoUnit.DAYS.between(
-                        festival.getFechaInicio(), festival.getFechaFin()) + 1)
-                .findFirst()
-                .orElse(0L);
+        double sueldoBase = SUELDO_BASE;	
 
         if ("COCINERO".equals(form.getTipo())) {
 
-            double plusCategoria;
-            if (Cocinero.EspecialidadCocinaEnum.COCINERO == form.getEspecialidad()) {
-                plusCategoria = PoliticaSalarial.PLUS_COCINERO;
-            } else if (Cocinero.EspecialidadCocinaEnum.COCINERO_AYUDANTE == form.getEspecialidad()) {
-                plusCategoria = PoliticaSalarial.PLUS_COCINERO_AYUDANTE;
-            } else if (Cocinero.EspecialidadCocinaEnum.LAVAPLATOS == form.getEspecialidad()) {
-                plusCategoria = PoliticaSalarial.PLUS_LAVAPLATOS;
-            } else {
-                throw new IllegalArgumentException("Especialidad de cocinero inválida.");
-            }
+        	double plusCategoria;
 
-            sueldo = sueldo + plusCategoria;
-            sueldo = sueldo + (sueldo * calcularPorcentajeFestival(cantidadDiasFestival));
+        	if (Cocinero.EspecialidadCocinaEnum.COCINERO == form.getEspecialidad()) {
+        	    plusCategoria = PLUS_COCINERO;
+        	} else if (Cocinero.EspecialidadCocinaEnum.COCINERO_AYUDANTE == form.getEspecialidad()) {
+        	    plusCategoria = PLUS_AYUDANTE;
+        	} else if (Cocinero.EspecialidadCocinaEnum.LAVAPLATOS == form.getEspecialidad()) {
+        	    plusCategoria = PLUS_LAVAPLATOS;
+        	} else {
+        	    throw new IllegalArgumentException("Especialidad de cocinero inválida.");
+        	}
 
-            empleado = new Cocinero(user, form.getFechaIngreso(), antiguedad,
-                    sueldo, form.getNombre(), form.getApellido(),
-                    form.getFechaNacimiento(), form.getDni(), form.getEspecialidad(),
-                    plusCategoria);
+        	empleado = new Cocinero(user, form.getFechaIngreso(), antiguedad, sueldoBase, form.getNombre(), form.getApellido(), form.getFechaNacimiento(), form.getDni(), form.getEspecialidad(),
+        	        plusCategoria
+        	);
 
         } else if ("CAJERO".equals(form.getTipo())) {
 
-            sueldo = sueldo + (sueldo * calcularPorcentajeFestival(cantidadDiasFestival));
+           
 
-            empleado = new Cajero(user, form.getFechaIngreso(), antiguedad,
-                    sueldo, form.getNombre(), form.getApellido(),
-                    form.getFechaNacimiento(), form.getDni(), form.getTurno());
+        	empleado = new Cajero(user, form.getFechaIngreso(), antiguedad, sueldoBase, form.getNombre(),  form.getApellido(),form.getFechaNacimiento(),form.getDni(), form.getTurno()
+        	);
 
         } else {
             throw new IllegalArgumentException("Tipo de empleado inválido.");
@@ -177,5 +168,61 @@ public class EmpleadoService {
         // 31 días / 15 = 2,06 → ceil = 3 → 3 × 0,5 = 1,5  → 150%
         return Math.ceil(cantidadDiasFestival / PoliticaSalarial.DIAS_BLOQUE_FESTIVAL) * PoliticaSalarial.PORCENTAJE_BLOQUE_FESTIVAL;
     }
+    
+    public double calcularSueldoPorFestival(
+            Empleado empleado, Festival festival) {
+
+        if (empleado == null || festival == null) {
+            throw new IllegalArgumentException(
+                    "El empleado y el festival son obligatorios");
+        }
+
+        if (festival.getFechaInicio() == null
+                || festival.getFechaFin() == null
+                || festival.getFechaFin().isBefore(festival.getFechaInicio())) {
+            throw new IllegalArgumentException(
+                    "Las fechas del festival no son válidas");
+        }
+
+        double sueldo = SUELDO_BASE;
+
+        // Cocineros: sueldo base + plus por categoría
+        if (empleado instanceof Cocinero cocinero) {
+
+            switch (cocinero.getEspecialidad()) {
+                case COCINERO:
+                    sueldo += PLUS_COCINERO;
+                    break;
+
+                case COCINERO_AYUDANTE:
+                    sueldo += PLUS_AYUDANTE;
+                    break;
+
+                case LAVAPLATOS:
+                    sueldo += PLUS_LAVAPLATOS;
+                    break;
+            }
+
+        // Cajeros: sueldo base + antigüedad
+        } else if (empleado instanceof Cajero) {
+
+            sueldo += PLUS_ANTIGUEDAD
+                    * empleado.calcularAntiguedad();
+
+        } else {
+            throw new IllegalArgumentException(
+                    "Tipo de empleado no válido");
+        }
+
+        // Cantidad de días del festival
+        long diasFestival = ChronoUnit.DAYS.between(festival.getFechaInicio(),festival.getFechaFin()) + 1;
+
+        // Porcentaje según la duración
+        double porcentaje = calcularPorcentajeFestival(diasFestival);
+
+        return sueldo * porcentaje;
+    }
+    
+  
 
 }
