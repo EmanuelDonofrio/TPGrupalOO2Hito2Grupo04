@@ -18,6 +18,7 @@ public class ViewRouteHelper {
 	public final static String RESPONSABLE_EMPLEADOS = "responsable/empleados";
 	public final static String RESPONSABLE_INICIO = "responsable/inicio";
 	public final static String RESPONSABLE_PLATOS = "responsable/platos";
+	public final static String RESPONSABLE_CALCULOS = "responsable/calculosyreportes";
 
 	// EMPLEADO
 	public final static String EMPLEADO_PERFIL = "empleado/perfil";
@@ -32,5 +33,6 @@ public class ViewRouteHelper {
 	public final static String ROUTE_RESPONSABLE_EMPLEADOS = "redirect:/responsable/empleados";
 	public final static String ROUTE_EMPLEADO_PERFIL = "redirect:/empleado/mi-informacion";
 	public final static String ROUTE_RESPONSABLE_PLATOS = "redirect:/responsable/platos";
+	public final static String ROUTE_RESPONSABLE_CALCULOS = "redirect:/responsable/calculosyreportes";
 
 }

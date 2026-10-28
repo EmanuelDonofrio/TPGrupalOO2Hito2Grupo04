@@ -1,9 +1,11 @@
 package com.epicentroGourmet.controllers;
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
+import com.epicentroGourmet.dto.ReporteVentaDTO;
 import com.epicentroGourmet.entities.Cajero;
 import com.epicentroGourmet.entities.Cocinero;
 import com.epicentroGourmet.entities.Empleado;
 import com.epicentroGourmet.entities.Plato;
+import com.epicentroGourmet.entities.UnidadVenta;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
 import com.epicentroGourmet.services.implementation.EmailService;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
@@ -182,6 +184,23 @@ public class ResponsableController {
         redirectAttributes.addFlashAttribute("mensaje",
                 "Plato eliminado correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
+    }
+
+    @GetMapping("/calculosyreportes")
+    public ModelAndView calculosyreportes(Authentication authentication) {
+
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        UnidadVenta unidadVenta = responsable.getUnidadVentaACargo();
+
+        double canon = empleadoService.calculoDeCanon(unidadVenta);
+        ReporteVentaDTO reporteVenta = empleadoService.reporteDeRecaudacion(unidadVenta);
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_CALCULOS);
+        modelAndView.addObject("unidadVentaACargo", unidadVenta);
+        modelAndView.addObject("canon", canon);
+        modelAndView.addObject("reporteVenta", reporteVenta);
+
+        return modelAndView;
     }
 
 
