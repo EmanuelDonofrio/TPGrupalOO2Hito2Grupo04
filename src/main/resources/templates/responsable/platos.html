@@ -37,8 +37,12 @@
                     <td th:text="${#numbers.formatDecimal(plato.precioVenta, 1, 2)}"></td>
                     <td th:text="${#numbers.formatDecimal(plato.precioCosto, 1, 2)}"></td>
                     <td>
+                        <a th:href="@{/responsable/platos/editar/{id}(id=${plato.idPlato})}"
+                           class="btn btn-sm btn-warning">
+                            Modificar
+                        </a>
                         <form th:action="@{/responsable/platos/eliminar/{id}(id=${plato.idPlato})}"
-                              method="post">
+                              method="post" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-danger"
                                     onclick="return confirm('¿Eliminar este plato?');">
                                 Eliminar

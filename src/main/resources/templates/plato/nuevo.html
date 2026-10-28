@@ -5,9 +5,14 @@
 <nav th:replace="~{layout :: navbar}"></nav>
 
 <main class="container py-4">
-    <h1 class="mb-4">Nuevo Plato</h1>
+    <h1 class="mb-4" th:text="${plato.idPlato == null ? 'Nuevo Plato' : 'Modificar Plato'}">
+        Nuevo Plato
+    </h1>
 
-    <form th:action="@{/responsable/platos/create}" th:object="${plato}" method="post">
+    <form th:action="${plato.idPlato == null}
+            ? @{/responsable/platos/create}
+            : @{/responsable/platos/update/{id}(id=${plato.idPlato})}"
+          th:object="${plato}" method="post">
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
             <input id="nombre" type="text" class="form-control" th:field="*{nombre}" required>
@@ -28,7 +33,10 @@
             <div class="text-danger" th:if="${#fields.hasErrors('precioCosto')}" th:errors="*{precioCosto}"></div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Crear plato</button>
+        <button type="submit" class="btn btn-primary"
+                th:text="${plato.idPlato == null ? 'Crear plato' : 'Guardar cambios'}">
+            Crear plato
+        </button>
         <a th:href="@{/responsable/platos}" class="btn btn-secondary">Cancelar</a>
     </form>
 

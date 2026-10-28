@@ -5,9 +5,11 @@ import com.epicentroGourmet.entities.Cocinero;
 import com.epicentroGourmet.entities.Empleado;
 import com.epicentroGourmet.entities.Plato;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
+import com.epicentroGourmet.services.implementation.EmailService;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import com.epicentroGourmet.services.implementation.PlatoService;
 import jakarta.validation.Valid;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -88,6 +90,7 @@ public class ResponsableController {
             return modelAndView;
         }
 
+
         empleadoService.crear(form, authentication.getName());
         redirectAttributes.addFlashAttribute("mensaje", "Empleado creado correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
@@ -114,11 +117,25 @@ public class ResponsableController {
         return modelAndView;
     }
 
-
     @GetMapping("/platos/nuevo")
     public ModelAndView crearPlato() {
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.PLATO_NUEVO);
         modelAndView.addObject("plato", new Plato());
+        return modelAndView;
+    }
+
+    @GetMapping("/platos/editar/{id}")
+    public ModelAndView editarPlato(@PathVariable("id") Long id,
+                                    Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        Plato plato = responsable.getUnidadVentaACargo().getMenu().stream()
+                .filter(platoMenu -> platoMenu.getIdPlato().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "El plato no pertenece a la unidad de venta del responsable."));
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.PLATO_NUEVO);
+        modelAndView.addObject("plato", plato);
         return modelAndView;
     }
 
@@ -136,6 +153,24 @@ public class ResponsableController {
 
         platoService.crear(plato, authentication.getName());
         redirectAttributes.addFlashAttribute("mensaje", "Plato creado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
+    }
+
+    @PostMapping("/platos/update/{id}")
+    public ModelAndView actualizarPlato(@PathVariable("id") Long id,
+                                        @Valid @ModelAttribute("plato") Plato plato,
+                                        BindingResult bindingResult,
+                                        RedirectAttributes redirectAttributes,
+                                        Authentication authentication) {
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.PLATO_NUEVO);
+        plato.setIdPlato(id);
+
+        if (bindingResult.hasErrors()) {
+            return modelAndView;
+        }
+
+        platoService.modificar(id, plato, authentication.getName());
+        redirectAttributes.addFlashAttribute("mensaje", "Plato modificado correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_PLATOS);
     }
 

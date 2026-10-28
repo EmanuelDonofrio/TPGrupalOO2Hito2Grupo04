@@ -10,6 +10,7 @@ import com.epicentroGourmet.entities.UserRole;
 import com.epicentroGourmet.repositories.IEmpleadoRepository;
 import com.epicentroGourmet.repositories.IUserRepository;
 import com.epicentroGourmet.repositories.IUserRoleRepository;
+import com.epicentroGourmet.services.negocio.PoliticaSalarial;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +33,16 @@ public class EmpleadoService {
     private static final double PLUS_COCINERO = 150000;
     private static final double PLUS_AYUDANTE = 100000;
     private static final double PLUS_LAVAPLATOS = 50000;
-    
+    private final EmailService emailService;
+
     public EmpleadoService(IEmpleadoRepository empleadoRepository, IUserRepository userRepository,
-                           IUserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder) {
+                           IUserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder,
+                           EmailService emailService) {
         this.empleadoRepository = empleadoRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     public Empleado obtenerEmpleado(String username) {
@@ -121,6 +125,19 @@ public class EmpleadoService {
         empleado.setUnidadVentaACargo(unidadVenta);
         user.setEmpleado(empleado);
 
+        //ENVIO DE MAIL
+        emailService.enviarMail(
+                "TP_OO2_GRUPO04@gmail.com",
+                "aza004aa@gmail.com",
+                "Epicentro Gourmet - Credenciales de acceso",
+                "Hola " + form.getNombre() + " " + form.getApellido() + ",\n\n"
+                + "¡Te damos la bienvenida a Epicentro Gourmet!\n\n"
+                + "Tu cuenta fue dada de alta en el sistema. A continuación, "
+                + "encontrarás tus datos de acceso:\n\n"
+                + "  Usuario: " + form.getUsername() + "\n"
+                + "  Contraseña: " + form.getPassword() + "\n\n"
+        );
+
         return empleadoRepository.save(empleado);
 
     }
@@ -149,7 +166,7 @@ public class EmpleadoService {
         // 16 días / 15 = 1,06 → ceil = 2 → 2 × 0,5 = 1,0  → 100%
         // 30 días / 15 = 2    → ceil = 2 → 2 × 0,5 = 1,0  → 100%
         // 31 días / 15 = 2,06 → ceil = 3 → 3 × 0,5 = 1,5  → 150%
-        return Math.ceil(cantidadDiasFestival / 15.0) * 0.5;
+        return Math.ceil(cantidadDiasFestival / PoliticaSalarial.DIAS_BLOQUE_FESTIVAL) * PoliticaSalarial.PORCENTAJE_BLOQUE_FESTIVAL;
     }
     
     public double calcularSueldoPorFestival(
