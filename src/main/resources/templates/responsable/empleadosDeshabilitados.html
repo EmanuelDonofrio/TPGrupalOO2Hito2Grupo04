@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1>Empleados deshabilitados</h1>
+            <p class="text-muted mb-0">Esta es la lista de empleados que estan registrados en el
+                sistema pero no tienen acceso porque fueron dados de baja.
+            </p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre y apellido</th>
+                <th scope="col">Antigüedad</th>
+                <th scope="col">DNI</th>
+                <th scope="col">Fecha de ingreso</th>
+                <th scope="col">Fecha de nacimiento</th>
+                <th scope="col">Sueldo base</th>
+                <th scope="col">Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="empleado : ${empleados}">
+                <td th:text="${empleado.idEmpleado}"></td>
+                <td th:text="${empleado.nombre + ' ' + empleado.apellido}"></td>
+                <td th:text="${empleado.antiguedad + ' años'}"></td>
+                <td th:text="${empleado.dni}"></td>
+                <td th:text="${#temporals.format(empleado.fechaIngreso, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(empleado.fechaNacimiento, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#numbers.formatDecimal(empleado.sueldoBase, 1, 2)}"></td>
+                <td>
+                    <form th:action="@{/responsable/empleados/eliminar/{id}(id=${empleado.idEmpleado})}"
+                          method="post" class="d-inline">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Dar de alta
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(empleados)}">
+                <td colspan="8" class="text-center text-muted">No hay empleados registrados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

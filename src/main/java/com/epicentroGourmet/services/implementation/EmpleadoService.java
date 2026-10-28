@@ -49,12 +49,12 @@ public class EmpleadoService {
 
     }
 
-    public List<Empleado> obtenerPorUnidadVenta(UnidadVenta unidadVenta) {
+    public List<Empleado> obtenerPorUnidadVenta(UnidadVenta unidadVenta, boolean enabled) {
         if (unidadVenta == null) {
             return List.of();
         }
         return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
-                unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, true);
+                unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled);
     }
 
     public String generarContrasenaAleatoria() {
