@@ -9,7 +9,7 @@ import java.util.Set;
 @Entity
 @Getter @Setter @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class UnidadVenta {
+public class UnidadVenta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
