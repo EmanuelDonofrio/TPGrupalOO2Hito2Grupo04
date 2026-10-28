@@ -120,8 +120,19 @@ public class ResponsableController {
                                          RedirectAttributes redirectAttributes) {
         empleadoService.eliminar(id);
         redirectAttributes.addFlashAttribute("mensaje",
-                "Empleado habilitado correctamente.");
+                "Empleado dado de baja correctamente.");
         return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS);
+    }
+
+    @PostMapping("/empleados/alta/{id}")
+    public ModelAndView altaEmpleado(@PathVariable("id") Long id,
+                                         RedirectAttributes redirectAttributes) {
+
+        empleadoService.habilitar(id);
+
+        redirectAttributes.addFlashAttribute("mensaje",
+                "Empleado habilitado correctamente.");
+        return new ModelAndView(ViewRouteHelper.ROUTE_RESPONSABLE_EMPLEADOS_DESHABILITADOS);
     }
 
 

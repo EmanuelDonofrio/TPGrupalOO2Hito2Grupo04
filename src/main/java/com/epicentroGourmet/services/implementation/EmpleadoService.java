@@ -183,6 +183,17 @@ public class EmpleadoService {
         return true;
     }
 
+    public boolean habilitar(Long id) {
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException());
+
+        empleado.getUsuario().setEnabled(true);
+
+        userRepository.save(empleado.getUsuario());
+
+        return true;
+    }
+
     private double calcularPorcentajeFestival(long cantidadDiasFestival) {
         if (cantidadDiasFestival <= 0) {
             return 0;
