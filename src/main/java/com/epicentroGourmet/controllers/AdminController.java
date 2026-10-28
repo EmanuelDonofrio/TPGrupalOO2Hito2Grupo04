@@ -8,6 +8,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.epicentroGourmet.services.IFestivalService;
 import com.epicentroGourmet.services.implementation.UnidadVentaService;
+import com.epicentroGourmet.repositories.RankingUnidadProjection;
+import java.util.List;
 
 @Controller
 @RequestMapping("/administrador")
@@ -40,4 +42,28 @@ public class AdminController {
 
 		return mav;
 	}
+
+	//VER RANKING DE UNIDADES DE VENTA POR FESTIVAL
+	
+	@GetMapping("/{id}/ranking")
+	public ModelAndView verRankingUnidades(@PathVariable Long id) {
+
+		ModelAndView mav = new ModelAndView("administrador/rankingUnidades");
+
+		// Obtener el festival seleccionado
+		mav.addObject("festival", festivalService.getAll()
+				.stream()
+				.filter(f -> f.getIdFestival().equals(id))
+				.findFirst()
+				.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
+
+		// Por ahora, el ranking se conectará en el siguiente paso
+		mav.addObject(
+			"ranking",
+			unidadVentaService.obtenerRankingPorFestival(id)
+		);
+
+		return mav;
+	}
+
 }
