@@ -1,24 +1,19 @@
 package com.epicentroGourmet.services.implementation;
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
-import com.epicentroGourmet.entities.Festival;
-import com.epicentroGourmet.entities.Cajero;
-import com.epicentroGourmet.entities.Cocinero;
-import com.epicentroGourmet.entities.Empleado;
-import com.epicentroGourmet.entities.UnidadVenta;
-import com.epicentroGourmet.entities.User;
-import com.epicentroGourmet.entities.UserRole;
+import com.epicentroGourmet.dto.ReporteVentaDTO;
+import com.epicentroGourmet.entities.*;
 import com.epicentroGourmet.repositories.IEmpleadoRepository;
 import com.epicentroGourmet.repositories.IUserRepository;
 import com.epicentroGourmet.repositories.IUserRoleRepository;
 import com.epicentroGourmet.services.negocio.PoliticaSalarial;
+import org.hibernate.Hibernate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service("empleadoService")
@@ -28,11 +23,6 @@ public class EmpleadoService {
     private final IUserRepository userRepository;
     private final IUserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
-    private static final double SUELDO_BASE = 100000;
-    private static final double PLUS_ANTIGUEDAD = 5000;
-    private static final double PLUS_COCINERO = 150000;
-    private static final double PLUS_AYUDANTE = 100000;
-    private static final double PLUS_LAVAPLATOS = 50000;
     private final EmailService emailService;
 
     public EmpleadoService(IEmpleadoRepository empleadoRepository, IUserRepository userRepository,
@@ -90,19 +80,19 @@ public class EmpleadoService {
         Empleado empleado;
         int antiguedad = Period.between(form.getFechaIngreso(), LocalDate.now()).getYears();
 
-        // LIQUIDACION DE HABERES
-        double sueldoBase = SUELDO_BASE;	
+
+        double sueldoBase = PoliticaSalarial.SUELDO_BASE;
 
         if ("COCINERO".equals(form.getTipo())) {
 
         	double plusCategoria;
 
         	if (Cocinero.EspecialidadCocinaEnum.COCINERO == form.getEspecialidad()) {
-        	    plusCategoria = PLUS_COCINERO;
+        	    plusCategoria = PoliticaSalarial.PLUS_COCINERO;
         	} else if (Cocinero.EspecialidadCocinaEnum.COCINERO_AYUDANTE == form.getEspecialidad()) {
-        	    plusCategoria = PLUS_AYUDANTE;
+        	    plusCategoria = PoliticaSalarial.PLUS_COCINERO_AYUDANTE;
         	} else if (Cocinero.EspecialidadCocinaEnum.LAVAPLATOS == form.getEspecialidad()) {
-        	    plusCategoria = PLUS_LAVAPLATOS;
+        	    plusCategoria = PoliticaSalarial.PLUS_LAVAPLATOS;
         	} else {
         	    throw new IllegalArgumentException("Especialidad de cocinero inválida.");
         	}
@@ -112,8 +102,6 @@ public class EmpleadoService {
         	);
 
         } else if ("CAJERO".equals(form.getTipo())) {
-
-           
 
         	empleado = new Cajero(user, form.getFechaIngreso(), antiguedad, sueldoBase, form.getNombre(),  form.getApellido(),form.getFechaNacimiento(),form.getDni(), form.getTurno()
         	);
@@ -184,29 +172,29 @@ public class EmpleadoService {
                     "Las fechas del festival no son válidas");
         }
 
-        double sueldo = SUELDO_BASE;
+        double sueldo = PoliticaSalarial.SUELDO_BASE;
 
         // Cocineros: sueldo base + plus por categoría
         if (empleado instanceof Cocinero cocinero) {
 
             switch (cocinero.getEspecialidad()) {
                 case COCINERO:
-                    sueldo += PLUS_COCINERO;
+                    sueldo += PoliticaSalarial.PLUS_COCINERO;
                     break;
 
                 case COCINERO_AYUDANTE:
-                    sueldo += PLUS_AYUDANTE;
+                    sueldo += PoliticaSalarial.PLUS_COCINERO_AYUDANTE;
                     break;
 
                 case LAVAPLATOS:
-                    sueldo += PLUS_LAVAPLATOS;
+                    sueldo += PoliticaSalarial.PLUS_LAVAPLATOS;
                     break;
             }
 
         // Cajeros: sueldo base + antigüedad
         } else if (empleado instanceof Cajero) {
 
-            sueldo += PLUS_ANTIGUEDAD
+            sueldo += PoliticaSalarial.PLUS_ANTIGUEDAD
                     * empleado.calcularAntiguedad();
 
         } else {
@@ -223,6 +211,51 @@ public class EmpleadoService {
         return sueldo * porcentaje;
     }
     
-  
+    public double calculoDeCanon(UnidadVenta unidadVenta) {
 
+        if (unidadVenta == null) {
+            throw new IllegalArgumentException("La unidad de venta es obligatoria.");
+        }
+
+        UnidadVenta unidadVentaReal = Hibernate.unproxy(unidadVenta, UnidadVenta.class);
+
+        double canon = 0.0;
+
+        if (unidadVentaReal instanceof FoodTruck foodTruck) {
+            canon = foodTruck.getSuperficie() * 500.0;
+            if (foodTruck.isConexionElectrica()) {
+                canon += 2000.0;
+            }
+        } else if (unidadVentaReal instanceof PuestoDesarmable puestoDesarmable) {
+            canon =  (puestoDesarmable.getSuperficie() * 500.0) - (puestoDesarmable.getTiempoMontaje() * 10.0);
+        }
+
+        return canon;
+    }
+
+    @Transactional(readOnly = true)
+    public ReporteVentaDTO reporteDeRecaudacion(UnidadVenta unidadVenta) {
+        if (unidadVenta == null) {
+            throw new IllegalArgumentException("La unidad de venta es obligatoria.");
+        }
+
+        Festival festival = unidadVenta.getFestivales().stream()
+                .findFirst() //Teniendo en cuenta que solo hay un unico festival como dice la consigna
+                .orElse(null);
+
+        String nombreFestival = festival != null
+                ? festival.getNombre()
+                : "Sin festival asignado";
+
+        BigDecimal recaudacionTotal = festival == null
+                ? BigDecimal.ZERO
+                : BigDecimal.valueOf(
+                        festival.getUnidadesDeVenta().stream()
+                                .flatMap(unidad -> unidad.getPedidos().stream())
+                                .mapToDouble(Pedido::getTotal)
+                                .sum()
+                );
+
+        return new ReporteVentaDTO(nombreFestival, recaudacionTotal);
+    }
 }

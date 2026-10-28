@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+
+<body>
+
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Cálculos y reportes</h2>
+        <a th:href="@{/responsable/}" class="btn btn-outline-secondary">Volver al panel</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Datos de la unidad</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Unidad:</strong> <span th:text="${unidadVentaACargo != null ? unidadVentaACargo.nombre : 'Sin asignación'}">Unidad</span></p>
+                    <p class="mb-2"><strong>Código:</strong> <span th:text="${unidadVentaACargo != null ? unidadVentaACargo.codigo : '---'}">Código</span></p>
+                    <p class="mb-2"><strong>Superficie:</strong> <span th:text="${unidadVentaACargo != null ? unidadVentaACargo.superficie : '---'}">Superficie</span></p>
+                    <p class="mb-0"><strong>Cánon estimado:</strong> $<span th:text="${#numbers.formatDecimal(canon, 1, 2)}">0.00</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Reporte de recaudacion</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Festival:</strong>
+                        <span th:text="${reporteVenta.nombreFestival}">Sin festival asignado</span>
+                    </p>
+                    <p class="mb-0"><strong>Recaudación total:</strong>
+                        $<span th:text="${#numbers.formatDecimal(reporteVenta.recaudacionTotal, 1, 2)}">0.00</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+
+</body>
+
+</html>
