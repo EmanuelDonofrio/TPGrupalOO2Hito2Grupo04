@@ -143,6 +143,72 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tarjeta de Rentabilidad Neta Total -->
+        <div class="col-12">
+            <div class="report-card">
+                <div class="report-card-header profit">
+                    <h3 class="h5 mb-1">Rentabilidad Neta Total</h3>
+                    <p class="small mb-0 opacity-75">Ventas totales menos costos de platos, sueldos de personal y canon</p>
+                </div>
+                <div class="report-card-body">
+                    <div class="data-row">
+                        <span class="data-label">Festival evaluado</span>
+                        <span class="data-value" th:text="${festival != null ? festival.nombre : 'No asignado'}">Festival</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Ganancia Neta Final</span>
+                        <span class="data-value amount profit-val"
+                              th:classappend="${rentabilidadNeta != null and rentabilidadNeta < 0} ? 'negative' : ''">
+                                        $<span th:text="${rentabilidadNeta != null ? #numbers.formatDecimal(rentabilidadNeta, 1, 2) : '0.00'}">0.00</span>
+                                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    <!--  RENTABILIDAD POR FECHAS  -->
+
+    <div class="col-12">
+        <div class="report-card h-100">
+            <div class="report-card-header" style="background: #1565c0; color: #fff;">
+                <h3 class="h5 mb-1">Rentabilidad Neta por Fechas</h3>
+                <p class="small mb-0 opacity-75">Filtrar por rango de fechas específico</p>
+            </div>
+            <div class="report-card-body">
+                <!-- Formulario de filtro de fechas -->
+                <form th:action="@{/responsable/calculosyreportes}" method="get" class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label for="fechaDesde" class="form-label small text-muted mb-0">Desde</label>
+                        <input type="date" id="fechaDesde" name="fechaDesde" th:value="${fechaDesde}" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="col-6">
+                        <label for="fechaHasta" class="form-label small text-muted mb-0">Hasta</label>
+                        <input type="date" id="fechaHasta" name="fechaHasta" th:value="${fechaHasta}" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <button type="submit" class="btn btn-sm btn-primary w-100">Calcular Rentabilidad del Período</button>
+                    </div>
+                </form>
+
+                <div class="data-row">
+                    <span class="data-label">Período consultado</span>
+                    <span class="data-value" th:text="${fechaDesde != null && fechaHasta != null ? (fechaDesde + ' al ' + fechaHasta) : 'Sin filtro aplicado'}">---</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Rentabilidad del período</span>
+                    <span class="data-value amount"
+                          th:style="${rentabilidadNetaFechas != null and rentabilidadNetaFechas < 0} ? 'color: #c62828;' : 'color: #1565c0;'">
+                                $<span th:text="${rentabilidadNetaFechas != null ? #numbers.formatDecimal(rentabilidadNetaFechas, 1, 2) : '0.00'}">0.00</span>
+                            </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
     </div>
 </main>
