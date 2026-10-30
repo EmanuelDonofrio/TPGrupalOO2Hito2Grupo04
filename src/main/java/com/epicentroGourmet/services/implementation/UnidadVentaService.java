@@ -1,24 +1,21 @@
 package com.epicentroGourmet.services.implementation;
 
+import com.epicentroGourmet.dto.PlatoDTO;
 import com.epicentroGourmet.dto.RegistroUnidadVentaDTO;
-import com.epicentroGourmet.entities.Empleado;
-import com.epicentroGourmet.entities.FoodTruck;
-import com.epicentroGourmet.entities.PuestoDesarmable;
-import com.epicentroGourmet.entities.UnidadVenta;
-import com.epicentroGourmet.entities.User;
-import com.epicentroGourmet.entities.UserRole;
-import com.epicentroGourmet.repositories.IEmpleadoRepository;
-import com.epicentroGourmet.repositories.IUnidadVentaRepository;
-import com.epicentroGourmet.repositories.IUserRepository;
-import com.epicentroGourmet.repositories.IUserRoleRepository;
+import com.epicentroGourmet.entities.*;
+import com.epicentroGourmet.repositories.*;
 import com.epicentroGourmet.services.IUnidadVentaService;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.epicentroGourmet.repositories.RankingUnidadProjection;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UnidadVentaService implements IUnidadVentaService {
@@ -29,16 +26,26 @@ public class UnidadVentaService implements IUnidadVentaService {
     private final IEmpleadoRepository empleadoRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final IPedidoRepository pedidoRepository;
+    private final IFestivalRepository festivalRepository;
+    private final EmpleadoService empleadoService;
+
     public UnidadVentaService(IUnidadVentaRepository unidadVentaRepository,
                               IUserRepository userRepository,
                               IUserRoleRepository userRoleRepository,
                               IEmpleadoRepository empleadoRepository,
-                              PasswordEncoder passwordEncoder) {
+                              PasswordEncoder passwordEncoder,
+                              IPedidoRepository pedidoRepository,
+                              IFestivalRepository festivalRepository,
+                              EmpleadoService empleadoService) {
         this.unidadVentaRepository = unidadVentaRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.empleadoRepository = empleadoRepository;
         this.passwordEncoder = passwordEncoder;
+        this.pedidoRepository = pedidoRepository;
+        this.festivalRepository = festivalRepository;
+        this.empleadoService = empleadoService;
     }
 
     @Override
@@ -118,5 +125,129 @@ public class UnidadVentaService implements IUnidadVentaService {
     public List<RankingUnidadProjection> obtenerRankingPorFestival(Long idFestival) {
         return unidadVentaRepository.obtenerRankingPorFestival(idFestival);
     }
+
+    //----- CALCULO DE RENTABILIDAD -------
+
+    // BALANCE (Método Auxiliar Reutilizable)
+    private BigDecimal calcularBalance(UnidadVenta unidad, Festival festival, List<Pedido> pedidos) {
+        // 1. Pedidos totales (ventas brutas)
+        double totalVentas = pedidos.stream()
+                .mapToDouble(Pedido::getTotal)
+                .sum();
+
+        // 2. Costos de producción de los platos vendidos
+        double costoTotalPlatos = pedidos.stream()
+                .flatMap(p -> p.getDetallesPedidos().stream())
+                .mapToDouble(item -> item.getPlato().getPrecioCosto() * item.getCantidad()) // O getCostoProduccion() según tu clase Plato
+                .sum();
+
+        // 3. Canon obligatorio
+        double canon = empleadoService.calculoDeCanon(unidad);
+
+        // 4. Sueldos obligatorios (Liquidación de haberes caso 4)
+        List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(unidad, true);
+        double totalSueldos = empleados.stream()
+                .mapToDouble(emp -> empleadoService.calcularSueldoPorFestival(emp, festival))
+                .sum();
+
+        // Rentabilidad Neta = (Ventas - Costos de Platos) - Sueldos - Canon
+        double rentabilidad = (totalVentas - costoTotalPlatos) - totalSueldos - canon;
+
+        return BigDecimal.valueOf(rentabilidad);
+    }
+
+    // Caso de Uso 6: Cálculo de Rentabilidad Neta Total
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal calcularRentabilidadNeta(Long idUnidadVenta, Long idFestival) {
+        UnidadVenta unidad = unidadVentaRepository.findById(idUnidadVenta)
+                .orElseThrow(() -> new IllegalArgumentException("Unidad de venta no encontrada"));
+        Festival festival = festivalRepository.findById(idFestival)
+                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado"));
+
+        // Se usa findByPuesto con la entidad unidad
+        List<Pedido> pedidos = pedidoRepository.findByPuesto(unidad);
+
+        return calcularBalance(unidad, festival, pedidos);
+    }
+
+    // Caso de Uso 7: Cálculo de Rentabilidad Neta entre fechas
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal calcularRentabilidadNetaEntreFechas(Long idUnidadVenta, Long idFestival, LocalDate fechaDesde, LocalDate fechaHasta) {
+        if (fechaDesde == null || fechaHasta == null || fechaHasta.isBefore(fechaDesde)) {
+            throw new IllegalArgumentException("El rango de fechas no es válido.");
+        }
+
+        UnidadVenta unidad = unidadVentaRepository.findById(idUnidadVenta)
+                .orElseThrow(() -> new IllegalArgumentException("Unidad de venta no encontrada"));
+        Festival festival = festivalRepository.findById(idFestival)
+                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado"));
+
+        // Conversión de LocalDate a LocalDateTime para abarcar los días completos
+        LocalDateTime desde = fechaDesde.atStartOfDay();
+        LocalDateTime hasta = fechaHasta.atTime(java.time.LocalTime.MAX);
+
+        // Se usa la consulta adaptada a fechaCreacion y puesto
+        List<Pedido> pedidos = pedidoRepository.findByPuestoAndFechaCreacionBetween(unidad, desde, hasta);
+
+        return calcularBalance(unidad, festival, pedidos);
+    }
+
+    // Caso de Uso 8: Plato Estrella
+    @Override
+    @Transactional(readOnly = true)
+    public PlatoDTO obtenerPlatoEstrella(Long idUnidadVenta, Long idFestival){
+        UnidadVenta unidad = unidadVentaRepository.findById(idUnidadVenta)
+                .orElseThrow(() -> new IllegalArgumentException("Unidad de venta no encontrada"));
+
+        // Validamos que exista el festival
+        festivalRepository.findById(idFestival)
+                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado"));
+
+        // 1. Obtenemos todos los pedidos del puesto
+        List<Pedido> pedidos = pedidoRepository.findByPuesto(unidad);
+
+        if (pedidos == null || pedidos.isEmpty()){
+            return null;
+        }
+
+        // 2. Agrupamos los platos y sumamos las cantidades pedidas
+        Map<Plato, Long> conteoPorPlato = pedidos.stream()
+                .flatMap(p -> p.getDetallesPedidos().stream())
+                .filter(d -> d.getPlato() != null)
+                .collect(Collectors.groupingBy(
+                        DetallePedido::getPlato,
+                        Collectors.summingLong(DetallePedido::getCantidad)
+                ));
+
+        if(conteoPorPlato.isEmpty()){
+            return null;
+        }
+
+        // 3. Buscamos el plato con amyor cantidad acumulada
+        Map.Entry<Plato, Long> platoGanador = conteoPorPlato.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
+        if(platoGanador == null){
+            return null;
+        }
+
+        Plato plato = platoGanador.getKey();
+        long totalVendido = platoGanador.getValue();
+
+        // 4. Finalmente retornamos el PlatoDTO con sus datos exactos
+
+        return new PlatoDTO(
+                plato.getIdPlato(),
+                plato.getNombre(),
+                plato.getPrecioVenta(),
+                plato.getPrecioCosto(),
+                totalVendido
+        );
+
+
+    }
+
 
 }
