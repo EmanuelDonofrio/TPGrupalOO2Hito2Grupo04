@@ -10,7 +10,6 @@ import com.epicentroGourmet.helpers.ViewRouteHelper;
 import com.epicentroGourmet.services.implementation.EmailService;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import com.epicentroGourmet.services.implementation.PlatoService;
-import com.epicentroGourmet.services.implementation.UnidadVentaService;
 import jakarta.validation.Valid;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
@@ -30,12 +29,10 @@ public class ResponsableController {
 
     private final EmpleadoService empleadoService;
     private final PlatoService platoService;
-    private final UnidadVentaService unidadVentaService;
 
-    public ResponsableController(EmpleadoService empleadoService, PlatoService platoService,UnidadVentaService unidadVentaService) {
+    public ResponsableController(EmpleadoService empleadoService, PlatoService platoService) {
         this.empleadoService = empleadoService;
         this.platoService = platoService;
-        this.unidadVentaService = unidadVentaService;
     }
 
     @GetMapping("/")
@@ -223,8 +220,8 @@ public class ResponsableController {
         Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
         UnidadVenta unidadVenta = responsable.getUnidadVentaACargo();
 
-        double canon = unidadVentaService.calculoDeCanon(unidadVenta);
-        ReporteVentaDTO reporteVenta = unidadVentaService.reporteDeRecaudacion(unidadVenta);
+        double canon = empleadoService.calculoDeCanon(unidadVenta);
+        ReporteVentaDTO reporteVenta = empleadoService.reporteDeRecaudacion(unidadVenta);
 
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_CALCULOS);
         modelAndView.addObject("unidadVentaACargo", unidadVenta);
