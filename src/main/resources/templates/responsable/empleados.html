@@ -67,6 +67,24 @@
                     </a>
                 </div>
             </form>
+
+            <div class="mt-3">
+                <span class="form-label fw-semibold d-block">Filtrar empleados por tipo o turno</span>
+                <div class="d-flex flex-wrap gap-2">
+                    <a th:href="@{/responsable/empleados/filtro(tipo='COCINERO')}"
+                       class="btn btn-outline-primary btn-sm mr-3">Cocinero</a>
+                    <a th:href="@{/responsable/empleados/filtro(tipo='COCINERO_AYUDANTE')}"
+                       class="btn btn-outline-primary btn-sm mr-3">Cocinero ayudante</a>
+                    <a th:href="@{/responsable/empleados/filtro(tipo='LAVAPLATOS')}"
+                       class="btn btn-outline-primary btn-sm mr-3">Lavaplatos</a>
+                    <a th:href="@{/responsable/empleados/filtro(tipo='TURNO_NOCHE')}"
+                       class="btn btn-outline-primary btn-sm mr-3">Turno noche</a>
+                    <a th:href="@{/responsable/empleados/filtro(tipo='TURNO_TARDE')}"
+                       class="btn btn-outline-primary btn-sm mr-3">Turno tarde</a>
+                    <a th:href="@{/responsable/empleados/filtro(tipo='TURNO_MANANA')}"
+                       class="btn btn-outline-primary btn-sm mr-3">Turno mañana</a>
+                </div>
+            </div>
         </div>
     </div>
 

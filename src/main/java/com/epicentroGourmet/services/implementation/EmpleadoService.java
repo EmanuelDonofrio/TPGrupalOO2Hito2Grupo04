@@ -66,6 +66,30 @@ public class EmpleadoService {
                 dni, unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled);
     }
 
+    public List<Empleado> obtenerPorFiltro(UnidadVenta unidadVenta, String filtro,
+                                           boolean enabled) {
+        if (unidadVenta == null || filtro == null || filtro.isBlank()) {
+            return List.of();
+        }
+
+        try {
+            Cocinero.EspecialidadCocinaEnum especialidad =
+                    Cocinero.EspecialidadCocinaEnum.valueOf(filtro);
+            return empleadoRepository.findCocinerosByEspecialidad(
+                    unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled, especialidad);
+        } catch (IllegalArgumentException ignored) {
+            // El filtro puede corresponder a un turno de cajero.
+        }
+
+        try {
+            Cajero.turnoEnum turno = Cajero.turnoEnum.valueOf(filtro);
+            return empleadoRepository.findCajerosByTurno(
+                    unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled, turno);
+        } catch (IllegalArgumentException ignored) {
+            return List.of();
+        }
+    }
+
     public String generarContrasenaAleatoria() {
         StringBuilder contrasena = new StringBuilder(LONGITUD_CONTRASENA);
 

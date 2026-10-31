@@ -1,6 +1,8 @@
 package com.epicentroGourmet.repositories;
 
 import com.epicentroGourmet.entities.Empleado;
+import com.epicentroGourmet.entities.Cajero;
+import com.epicentroGourmet.entities.Cocinero;
 import com.epicentroGourmet.entities.UnidadVenta;
 import com.epicentroGourmet.entities.UserRole;
 import java.util.Optional;
@@ -23,4 +25,32 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     Optional<Empleado> findByDniAndUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
             Long dni, UnidadVenta unidadVenta, UserRole.RolEnum role, boolean enabled);
+
+    @Query("""
+            select e from Empleado e
+            where e.unidadVentaACargo = :unidadVenta
+              and e.usuario.userRole.role = :role
+              and e.usuario.enabled = :enabled
+              and type(e) = Cocinero
+              and treat(e as Cocinero).especialidad = :especialidad
+            """)
+    List<Empleado> findCocinerosByEspecialidad(
+            @Param("unidadVenta") UnidadVenta unidadVenta,
+            @Param("role") UserRole.RolEnum role,
+            @Param("enabled") boolean enabled,
+            @Param("especialidad") Cocinero.EspecialidadCocinaEnum especialidad);
+
+    @Query("""
+            select e from Empleado e
+            where e.unidadVentaACargo = :unidadVenta
+              and e.usuario.userRole.role = :role
+              and e.usuario.enabled = :enabled
+              and type(e) = Cajero
+              and treat(e as Cajero).turno = :turno
+            """)
+    List<Empleado> findCajerosByTurno(
+            @Param("unidadVenta") UnidadVenta unidadVenta,
+            @Param("role") UserRole.RolEnum role,
+            @Param("enabled") boolean enabled,
+            @Param("turno") Cajero.turnoEnum turno);
 }

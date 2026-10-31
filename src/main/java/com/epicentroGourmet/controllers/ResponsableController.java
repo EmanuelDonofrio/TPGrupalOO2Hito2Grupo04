@@ -93,6 +93,21 @@ public class ResponsableController {
         return modelAndView;
     }
 
+    @GetMapping("/empleados/filtro")
+    public ModelAndView filtrarEmpleados(@RequestParam("tipo") String tipo,
+                                         Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        List<Empleado> empleados = empleadoService.obtenerPorFiltro(
+                responsable.getUnidadVentaACargo(), tipo, true);
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
+        modelAndView.addObject("empleados", empleados);
+        if (empleados.isEmpty()) {
+            modelAndView.addObject("error", "No se encontraron empleados para el filtro seleccionado.");
+        }
+        return modelAndView;
+    }
+
     @GetMapping("/empleadosDeshabilitados")
     public ModelAndView verEmpleadosDeshabilitados(Authentication authentication) {
         Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
