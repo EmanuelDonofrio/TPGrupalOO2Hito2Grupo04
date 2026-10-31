@@ -1,21 +1,20 @@
 package com.epicentroGourmet.services.implementation;
 
-import com.epicentroGourmet.dto.PlatoDTO;
 import com.epicentroGourmet.dto.RegistroUnidadVentaDTO;
 import com.epicentroGourmet.entities.*;
-import com.epicentroGourmet.repositories.*;
+import com.epicentroGourmet.repositories.IEmpleadoRepository;
+import com.epicentroGourmet.repositories.IUnidadVentaRepository;
+import com.epicentroGourmet.repositories.IUserRepository;
+import com.epicentroGourmet.repositories.IUserRoleRepository;
 import com.epicentroGourmet.services.IUnidadVentaService;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.epicentroGourmet.repositories.RankingUnidadProjection;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class UnidadVentaService implements IUnidadVentaService {
@@ -25,9 +24,6 @@ public class UnidadVentaService implements IUnidadVentaService {
     private final IUserRoleRepository userRoleRepository;
     private final IEmpleadoRepository empleadoRepository;
     private final PasswordEncoder passwordEncoder;
-
-    private final IPedidoRepository pedidoRepository;
-    private final IFestivalRepository festivalRepository;
     private final EmpleadoService empleadoService;
 
     public UnidadVentaService(IUnidadVentaRepository unidadVentaRepository,
@@ -35,16 +31,12 @@ public class UnidadVentaService implements IUnidadVentaService {
                               IUserRoleRepository userRoleRepository,
                               IEmpleadoRepository empleadoRepository,
                               PasswordEncoder passwordEncoder,
-                              IPedidoRepository pedidoRepository,
-                              IFestivalRepository festivalRepository,
                               EmpleadoService empleadoService) {
         this.unidadVentaRepository = unidadVentaRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.empleadoRepository = empleadoRepository;
         this.passwordEncoder = passwordEncoder;
-        this.pedidoRepository = pedidoRepository;
-        this.festivalRepository = festivalRepository;
         this.empleadoService = empleadoService;
     }
 
@@ -142,7 +134,7 @@ public class UnidadVentaService implements IUnidadVentaService {
                 .sum();
 
         // 3. Canon obligatorio
-        double canon = empleadoService.calculoDeCanon(unidad);
+        double canon = unidadVentaService.calculoDeCanon(unidad);
 
         // 4. Sueldos obligatorios (Liquidación de haberes caso 4)
         List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(unidad, true);
