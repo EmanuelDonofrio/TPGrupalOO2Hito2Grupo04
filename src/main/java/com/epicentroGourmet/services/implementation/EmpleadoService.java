@@ -263,57 +263,6 @@ public class EmpleadoService {
 
         return sueldo * porcentaje;
     }
-    
-    public double calculoDeCanon(UnidadVenta unidadVenta) {
 
-        if (unidadVenta == null) {
-            throw new IllegalArgumentException("La unidad de venta es obligatoria.");
-        }
-
-        UnidadVenta unidadVentaReal = Hibernate.unproxy(unidadVenta, UnidadVenta.class);
-        Festival festival = unidadVenta.getFestivales().stream()
-                .findFirst() //Teniendo en cuenta que solo hay un unico festival como dice la consigna
-                .orElse(null);
-
-        //De base se arranca con este valor, luego se suma dependiendo la superficie que usa, si usa conex electrica, montaje
-        double canon = festival.getCosto().getCostoBase();
-
-        if (unidadVentaReal instanceof FoodTruck foodTruck) {
-            canon += foodTruck.getSuperficie() * festival.getCosto().getCostoSuperficie();
-            if (foodTruck.isConexionElectrica()) {
-                canon += festival.getCosto().getCostoElectricidad();
-            }
-        } else if (unidadVentaReal instanceof PuestoDesarmable puestoDesarmable) {
-            canon +=  (puestoDesarmable.getSuperficie() *  festival.getCosto().getCostoSuperficie()) - (puestoDesarmable.getTiempoMontaje() *  festival.getCosto().getCostoMontaje());
-        }
-
-        return canon;
-    }
-
-    @Transactional(readOnly = true)
-    public ReporteVentaDTO reporteDeRecaudacion(UnidadVenta unidadVenta) {
-        if (unidadVenta == null) {
-            throw new IllegalArgumentException("La unidad de venta es obligatoria.");
-        }
-
-        Festival festival = unidadVenta.getFestivales().stream()
-                .findFirst() //Teniendo en cuenta que solo hay un unico festival como dice la consigna
-                .orElse(null);
-
-        String nombreFestival = festival != null
-                ? festival.getNombre()
-                : "Sin festival asignado";
-
-        BigDecimal recaudacionTotal = festival == null
-                ? BigDecimal.ZERO
-                : BigDecimal.valueOf(
-                        festival.getUnidadesDeVenta().stream()
-                                .flatMap(unidad -> unidad.getPedidos().stream())
-                                .mapToDouble(Pedido::getTotal)
-                                .sum()
-                );
-
-        return new ReporteVentaDTO(nombreFestival, recaudacionTotal);
-    }
 
 }

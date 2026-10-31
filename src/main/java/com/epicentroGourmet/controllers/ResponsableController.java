@@ -8,6 +8,7 @@ import com.epicentroGourmet.services.IUnidadVentaService;
 import com.epicentroGourmet.services.implementation.EmailService;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import com.epicentroGourmet.services.implementation.PlatoService;
+import com.epicentroGourmet.services.implementation.UnidadVentaService;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -245,8 +246,8 @@ public class ResponsableController {
         modelAndView.addObject("unidadVentaACargo", unidadVenta);
 
         if(unidadVenta != null) {
-            double canon = empleadoService.calculoDeCanon(unidadVenta);
-            ReporteVentaDTO reporteVenta = empleadoService.reporteDeRecaudacion(unidadVenta);
+            double canon = unidadVentaService.calculoDeCanon(unidadVenta);
+            ReporteVentaDTO reporteVenta = unidadVentaService.reporteDeRecaudacion(unidadVenta);
 
             modelAndView.addObject("canon", canon);
             modelAndView.addObject("reporteVenta", reporteVenta);
