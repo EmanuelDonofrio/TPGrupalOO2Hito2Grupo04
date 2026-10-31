@@ -20,4 +20,7 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     List<Empleado> findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
             UnidadVenta unidadVenta, UserRole.RolEnum role, boolean enabled);
+
+    Optional<Empleado> findByDniAndUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
+            Long dni, UnidadVenta unidadVenta, UserRole.RolEnum role, boolean enabled);
 }

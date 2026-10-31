@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @PreAuthorize("hasRole('RESPONSABLE')")
@@ -71,6 +72,24 @@ public class ResponsableController {
 
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
         modelAndView.addObject("empleados", empleados);
+        return modelAndView;
+    }
+
+    @GetMapping("/empleados/buscar")
+    public ModelAndView buscarEmpleadoPorDni(@RequestParam("dni") Long dni,
+                                             Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
+
+        Optional<Empleado> empleadoEncontrado = empleadoService.obtenerPorDni(
+                responsable.getUnidadVentaACargo(), dni, true);
+        modelAndView.addObject("empleados", empleadoEncontrado
+                .map(List::of)
+                .orElseGet(List::of));
+
+        if (empleadoEncontrado.isEmpty()) {
+            modelAndView.addObject("error", "No se encontró un empleado activo con ese DNI.");
+        }
         return modelAndView;
     }
 

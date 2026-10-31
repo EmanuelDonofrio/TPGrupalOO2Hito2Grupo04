@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 
 @Service("empleadoService")
 public class EmpleadoService {
@@ -55,6 +56,14 @@ public class EmpleadoService {
         }
         return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
                 unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled);
+    }
+
+    public Optional<Empleado> obtenerPorDni(UnidadVenta unidadVenta, Long dni, boolean enabled) {
+        if (unidadVenta == null || dni == null || dni <= 0) {
+            return Optional.empty();
+        }
+        return empleadoRepository.findByDniAndUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
+                dni, unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled);
     }
 
     public String generarContrasenaAleatoria() {

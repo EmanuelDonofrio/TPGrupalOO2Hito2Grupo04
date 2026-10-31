@@ -44,6 +44,32 @@
         </a>
     </div>
 
+    <div class="alert alert-danger mt-4" role="alert"
+         th:if="${error}" th:text="${error}">
+        No se encontró un empleado activo con ese DNI.
+    </div>
+
+    <div class="card border-0 shadow-sm my-4">
+        <div class="card-body">
+            <label for="filtroDni" class="form-label fw-semibold">Buscar empleado por DNI</label>
+            <form th:action="@{/responsable/empleados/buscar}" method="get"
+                  class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <input id="filtroDni" name="dni" type="number" min="1"
+                           class="form-control" placeholder="Ingrese el DNI" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
+                <div class="col-auto">
+                    <a th:href="@{/responsable/empleados}" class="btn btn-outline-secondary">
+                        Ver todos
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="employee-table-wrapper">
         <table class="table table-striped table-hover align-middle employee-table">
             <thead>
