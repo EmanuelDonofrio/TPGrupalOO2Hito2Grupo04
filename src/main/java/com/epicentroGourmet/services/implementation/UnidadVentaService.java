@@ -1,20 +1,23 @@
 package com.epicentroGourmet.services.implementation;
 
+import com.epicentroGourmet.dto.PlatoDTO;
 import com.epicentroGourmet.dto.RegistroUnidadVentaDTO;
+import com.epicentroGourmet.dto.ReporteVentaDTO;
 import com.epicentroGourmet.entities.*;
-import com.epicentroGourmet.repositories.IEmpleadoRepository;
-import com.epicentroGourmet.repositories.IUnidadVentaRepository;
-import com.epicentroGourmet.repositories.IUserRepository;
-import com.epicentroGourmet.repositories.IUserRoleRepository;
+import com.epicentroGourmet.repositories.*;
 import com.epicentroGourmet.services.IUnidadVentaService;
+import org.hibernate.Hibernate;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.epicentroGourmet.repositories.RankingUnidadProjection;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UnidadVentaService implements IUnidadVentaService {
@@ -24,6 +27,9 @@ public class UnidadVentaService implements IUnidadVentaService {
     private final IUserRoleRepository userRoleRepository;
     private final IEmpleadoRepository empleadoRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final IPedidoRepository pedidoRepository;
+    private final IFestivalRepository festivalRepository;
     private final EmpleadoService empleadoService;
 
     public UnidadVentaService(IUnidadVentaRepository unidadVentaRepository,
@@ -31,12 +37,16 @@ public class UnidadVentaService implements IUnidadVentaService {
                               IUserRoleRepository userRoleRepository,
                               IEmpleadoRepository empleadoRepository,
                               PasswordEncoder passwordEncoder,
+                              IPedidoRepository pedidoRepository,
+                              IFestivalRepository festivalRepository,
                               EmpleadoService empleadoService) {
         this.unidadVentaRepository = unidadVentaRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.empleadoRepository = empleadoRepository;
         this.passwordEncoder = passwordEncoder;
+        this.pedidoRepository = pedidoRepository;
+        this.festivalRepository = festivalRepository;
         this.empleadoService = empleadoService;
     }
 
@@ -134,7 +144,7 @@ public class UnidadVentaService implements IUnidadVentaService {
                 .sum();
 
         // 3. Canon obligatorio
-        double canon = unidadVentaService.calculoDeCanon(unidad);
+        double canon = this.calculoDeCanon(unidad);
 
         // 4. Sueldos obligatorios (Liquidación de haberes caso 4)
         List<Empleado> empleados = empleadoService.obtenerPorUnidadVenta(unidad, true);
@@ -241,5 +251,56 @@ public class UnidadVentaService implements IUnidadVentaService {
 
     }
 
+    public double calculoDeCanon(UnidadVenta unidadVenta) {
+
+        if (unidadVenta == null) {
+            throw new IllegalArgumentException("La unidad de venta es obligatoria.");
+        }
+
+        UnidadVenta unidadVentaReal = Hibernate.unproxy(unidadVenta, UnidadVenta.class);
+        Festival festival = unidadVenta.getFestivales().stream()
+                .findFirst() //Teniendo en cuenta que solo hay un unico festival como dice la consigna
+                .orElse(null);
+
+        //De base se arranca con este valor, luego se suma dependiendo la superficie que usa, si usa conex electrica, montaje
+        double canon = festival.getCosto().getCostoBase();
+
+        if (unidadVentaReal instanceof FoodTruck foodTruck) {
+            canon += foodTruck.getSuperficie() * festival.getCosto().getCostoSuperficie();
+            if (foodTruck.isConexionElectrica()) {
+                canon += festival.getCosto().getCostoElectricidad();
+            }
+        } else if (unidadVentaReal instanceof PuestoDesarmable puestoDesarmable) {
+            canon +=  (puestoDesarmable.getSuperficie() *  festival.getCosto().getCostoSuperficie()) - (puestoDesarmable.getTiempoMontaje() *  festival.getCosto().getCostoMontaje());
+        }
+
+        return canon;
+    }
+
+    @Transactional(readOnly = true)
+    public ReporteVentaDTO reporteDeRecaudacion(UnidadVenta unidadVenta) {
+        if (unidadVenta == null) {
+            throw new IllegalArgumentException("La unidad de venta es obligatoria.");
+        }
+
+        Festival festival = unidadVenta.getFestivales().stream()
+                .findFirst() //Teniendo en cuenta que solo hay un unico festival como dice la consigna
+                .orElse(null);
+
+        String nombreFestival = festival != null
+                ? festival.getNombre()
+                : "Sin festival asignado";
+
+        BigDecimal recaudacionTotal = festival == null
+                ? BigDecimal.ZERO
+                : BigDecimal.valueOf(
+                festival.getUnidadesDeVenta().stream()
+                        .flatMap(unidad -> unidad.getPedidos().stream())
+                        .mapToDouble(Pedido::getTotal)
+                        .sum()
+        );
+
+        return new ReporteVentaDTO(nombreFestival, recaudacionTotal);
+    }
 
 }

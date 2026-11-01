@@ -1,16 +1,17 @@
 package com.epicentroGourmet.controllers;
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
+import com.epicentroGourmet.dto.PlatoDTO;
 import com.epicentroGourmet.dto.ReporteVentaDTO;
-import com.epicentroGourmet.entities.Cajero;
-import com.epicentroGourmet.entities.Cocinero;
-import com.epicentroGourmet.entities.Empleado;
-import com.epicentroGourmet.entities.Plato;
-import com.epicentroGourmet.entities.UnidadVenta;
+import com.epicentroGourmet.entities.*;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
+import com.epicentroGourmet.services.IUnidadVentaService;
 import com.epicentroGourmet.services.implementation.EmailService;
 import com.epicentroGourmet.services.implementation.EmpleadoService;
 import com.epicentroGourmet.services.implementation.PlatoService;
+import com.epicentroGourmet.services.implementation.UnidadVentaService;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @PreAuthorize("hasRole('RESPONSABLE')")
@@ -29,10 +33,12 @@ public class ResponsableController {
 
     private final EmpleadoService empleadoService;
     private final PlatoService platoService;
+    private final IUnidadVentaService unidadVentaService;
 
-    public ResponsableController(EmpleadoService empleadoService, PlatoService platoService) {
+    public ResponsableController(EmpleadoService empleadoService, PlatoService platoService, IUnidadVentaService unidadVentaService) {
         this.empleadoService = empleadoService;
         this.platoService = platoService;
+        this.unidadVentaService= unidadVentaService;
     }
 
     @GetMapping("/")
@@ -66,6 +72,39 @@ public class ResponsableController {
 
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
         modelAndView.addObject("empleados", empleados);
+        return modelAndView;
+    }
+
+    @GetMapping("/empleados/buscar")
+    public ModelAndView buscarEmpleadoPorDni(@RequestParam("dni") Long dni,
+                                             Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
+
+        Optional<Empleado> empleadoEncontrado = empleadoService.obtenerPorDni(
+                responsable.getUnidadVentaACargo(), dni, true);
+        modelAndView.addObject("empleados", empleadoEncontrado
+                .map(List::of)
+                .orElseGet(List::of));
+
+        if (empleadoEncontrado.isEmpty()) {
+            modelAndView.addObject("error", "No se encontró un empleado activo con ese DNI.");
+        }
+        return modelAndView;
+    }
+
+    @GetMapping("/empleados/filtro")
+    public ModelAndView filtrarEmpleados(@RequestParam("tipo") String tipo,
+                                         Authentication authentication) {
+        Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        List<Empleado> empleados = empleadoService.obtenerPorFiltro(
+                responsable.getUnidadVentaACargo(), tipo, true);
+
+        ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_EMPLEADOS);
+        modelAndView.addObject("empleados", empleados);
+        if (empleados.isEmpty()) {
+            modelAndView.addObject("error", "No se encontraron empleados para el filtro seleccionado.");
+        }
         return modelAndView;
     }
 
@@ -137,13 +176,26 @@ public class ResponsableController {
 
 
     @GetMapping("/platos")
+    @Transactional(readOnly = true)
     public ModelAndView verPlatos(Authentication authentication) {
         Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
+        UnidadVenta unidad = responsable.getUnidadVentaACargo();
         List<Plato> platos = platoService.obtenerPorUnidadVenta(
                 responsable.getUnidadVentaACargo());
 
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_PLATOS);
         modelAndView.addObject("platos", platos);
+
+        // Caso de uso: Plato Estrella
+        if(unidad != null){
+            Festival festival = unidad.getFestivales().stream().findFirst().orElse(null);
+            if(festival != null){
+                PlatoDTO platoEstrella = unidadVentaService.obtenerPlatoEstrella(
+                        unidad.getIdUnidadVenta(), festival.getIdFestival());
+                modelAndView.addObject("platoEstrella", platoEstrella);
+            }
+        }
+
         return modelAndView;
     }
 
@@ -215,18 +267,52 @@ public class ResponsableController {
     }
 
     @GetMapping("/calculosyreportes")
-    public ModelAndView calculosyreportes(Authentication authentication) {
+    public ModelAndView calculosyreportes(
+            @RequestParam(name = "fechaDesde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
+            @RequestParam(name = "fechaHasta", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaHasta,
+            Authentication authentication) {
+
 
         Empleado responsable = empleadoService.obtenerEmpleado(authentication.getName());
         UnidadVenta unidadVenta = responsable.getUnidadVentaACargo();
 
-        double canon = empleadoService.calculoDeCanon(unidadVenta);
-        ReporteVentaDTO reporteVenta = empleadoService.reporteDeRecaudacion(unidadVenta);
-
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_CALCULOS);
         modelAndView.addObject("unidadVentaACargo", unidadVenta);
-        modelAndView.addObject("canon", canon);
-        modelAndView.addObject("reporteVenta", reporteVenta);
+
+        if(unidadVenta != null) {
+            double canon = unidadVentaService.calculoDeCanon(unidadVenta);
+            ReporteVentaDTO reporteVenta = unidadVentaService.reporteDeRecaudacion(unidadVenta);
+
+            modelAndView.addObject("canon", canon);
+            modelAndView.addObject("reporteVenta", reporteVenta);
+
+            Festival festival = unidadVenta.getFestivales().stream().findFirst().orElse(null);
+
+            modelAndView.addObject("festival", festival);
+
+            if(festival != null){
+                //Rentabilidad Neta
+                BigDecimal rentabilidadNeta = unidadVentaService.calcularRentabilidadNeta(
+                        unidadVenta.getIdUnidadVenta(), festival.getIdFestival());
+                modelAndView.addObject("rentabilidadNeta", rentabilidadNeta);
+
+                // Rentabilidad neta entre fechas
+                if(fechaDesde != null && fechaHasta != null){
+                    if(!fechaHasta.isBefore(fechaDesde)){
+                        BigDecimal rentabilidadNetaFechas = unidadVentaService.calcularRentabilidadNetaEntreFechas(
+                                unidadVenta.getIdUnidadVenta(), festival.getIdFestival(), fechaDesde, fechaHasta);
+                        modelAndView.addObject("rentabilidadNetaFechas", rentabilidadNetaFechas);
+                        modelAndView.addObject("fechaDesde", fechaDesde);
+                        modelAndView.addObject("fechaHasta", fechaHasta);
+                    }else{
+                        modelAndView.addObject("errorFechas", "La fecha 'Hasta no puede ser anterior a la fecha 'Desde'.");
+                    }
+                }
+
+            }
+
+
+        }
 
         return modelAndView;
     }

@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 
 @Service("empleadoService")
 public class EmpleadoService {
@@ -55,6 +56,38 @@ public class EmpleadoService {
         }
         return empleadoRepository.findByUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
                 unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled);
+    }
+
+    public Optional<Empleado> obtenerPorDni(UnidadVenta unidadVenta, Long dni, boolean enabled) {
+        if (unidadVenta == null || dni == null || dni <= 0) {
+            return Optional.empty();
+        }
+        return empleadoRepository.findByDniAndUnidadVentaACargoAndUsuarioUserRoleRoleAndUsuarioEnabled(
+                dni, unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled);
+    }
+
+    public List<Empleado> obtenerPorFiltro(UnidadVenta unidadVenta, String filtro,
+                                           boolean enabled) {
+        if (unidadVenta == null || filtro == null || filtro.isBlank()) {
+            return List.of();
+        }
+
+        try {
+            Cocinero.EspecialidadCocinaEnum especialidad =
+                    Cocinero.EspecialidadCocinaEnum.valueOf(filtro);
+            return empleadoRepository.findCocinerosByEspecialidad(
+                    unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled, especialidad);
+        } catch (IllegalArgumentException ignored) {
+            // El filtro puede corresponder a un turno de cajero.
+        }
+
+        try {
+            Cajero.turnoEnum turno = Cajero.turnoEnum.valueOf(filtro);
+            return empleadoRepository.findCajerosByTurno(
+                    unidadVenta, UserRole.RolEnum.ROLE_EMPLEADO, enabled, turno);
+        } catch (IllegalArgumentException ignored) {
+            return List.of();
+        }
     }
 
     public String generarContrasenaAleatoria() {

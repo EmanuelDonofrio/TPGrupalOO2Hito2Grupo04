@@ -126,6 +126,4 @@ public class EmpleadoController {
                     "attachment; filename=\"recibo-festival-"
                             + idFestival + ".pdf\"").contentType(MediaType.APPLICATION_PDF).body(pdf);
     }
-
-
 }
