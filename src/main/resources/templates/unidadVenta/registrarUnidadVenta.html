@@ -30,11 +30,7 @@
                                 <input type="number" step="0.1" class="form-control" th:field="*{superficie}">
                                 <small class="text-danger" th:errors="*{superficie}"></small>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Código (10 car.) *</label>
-                                <input type="text" maxlength="10" class="form-control" th:field="*{codigo}">
-                                <small class="text-danger" th:errors="*{codigo}"></small>
-                            </div>
+
                             <div class="col-md-12">
                                 <label class="form-label">Tipo de Unidad *</label>
                                 <select class="form-select" id="selectTipo" th:field="*{tipoUnidad}" onchange="cambiarTipo()">

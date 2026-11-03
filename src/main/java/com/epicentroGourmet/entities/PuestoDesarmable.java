@@ -12,7 +12,7 @@ public class PuestoDesarmable extends UnidadVenta{
     private Integer cantidadCarpas;
     private Integer tiempoMontaje;
 
-    public PuestoDesarmable(Empleado responsable, String nombre, double superficie, Long codigo, Integer cantidadCarpas) {
+    public PuestoDesarmable(Empleado responsable, String nombre, double superficie, String codigo, Integer cantidadCarpas) {
         super(responsable, nombre, superficie, codigo);
         this.cantidadCarpas = cantidadCarpas;
     }

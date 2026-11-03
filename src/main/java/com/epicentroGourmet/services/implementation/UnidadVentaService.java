@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +33,10 @@ public class UnidadVentaService implements IUnidadVentaService {
     private final IFestivalRepository festivalRepository;
     private final EmpleadoService empleadoService;
 
+    // Caracteres permitidos: números, mayúsculas y minúsculas
+    private static final String CARACTERES_CODIGO = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     public UnidadVentaService(IUnidadVentaRepository unidadVentaRepository,
                               IUserRepository userRepository,
                               IUserRoleRepository userRoleRepository,
@@ -50,9 +55,36 @@ public class UnidadVentaService implements IUnidadVentaService {
         this.empleadoService = empleadoService;
     }
 
+    // Generador de código aleatorio de 10 caracteres alfanuméricos
+    private String generarCodigoAleatorio(int longitud){
+        StringBuilder sb = new StringBuilder(longitud);
+        for(int i = 0; i < longitud; i++){
+            int indice = RANDOM.nextInt(CARACTERES_CODIGO.length());
+            sb.append(CARACTERES_CODIGO.charAt(indice));
+        }
+        return sb.toString();
+    }
+
     @Override
     @Transactional
     public void registrarUnidadConResponsable(RegistroUnidadVentaDTO dto) throws Exception {
+
+
+        // --- VALIDACIONES DE NEGOCIO ---
+
+        // Validar que la cuenta de usuario no exista previamente
+        if(userRepository.existsByUsername(dto.getUsername())){
+            throw new IllegalArgumentException("La cuenta de usuario '" + dto.getUsername() + "' ya se encuentra registrada en el sistema.");
+        }
+
+        // Validar que el DNI del responsable no esté repetido
+        if(empleadoRepository.existsByDni(dto.getDniResponsable())){
+            throw new IllegalArgumentException("Ya existe un empleado registrado con el DNI " + dto.getDniResponsable() + ".");
+        }
+
+
+
+
         // 1. Obtener o crear el Rol ROLE_RESPONSABLE
         UserRole roleResponsable = userRoleRepository.findByRole(UserRole.RolEnum.ROLE_RESPONSABLE)
                 .orElseGet(() -> {
@@ -102,7 +134,8 @@ public class UnidadVentaService implements IUnidadVentaService {
 
         unidad.setNombre(dto.getNombreComercial());
         unidad.setSuperficie(dto.getSuperficie());
-        unidad.setCodigo(Long.parseLong(dto.getCodigo()));
+        String codigoAleatorio = generarCodigoAleatorio(10);
+        unidad.setCodigo(codigoAleatorio);
         unidad.setResponsable(responsable);
 
         // Guardamos la unidad de venta
@@ -258,9 +291,19 @@ public class UnidadVentaService implements IUnidadVentaService {
         }
 
         UnidadVenta unidadVentaReal = Hibernate.unproxy(unidadVenta, UnidadVenta.class);
+
+        // Validación de festival asignado
+        if (unidadVenta.getFestivales() == null || unidadVenta.getFestivales().isEmpty()) {
+            return 0.0;
+        }
+
         Festival festival = unidadVenta.getFestivales().stream()
                 .findFirst() //Teniendo en cuenta que solo hay un unico festival como dice la consigna
                 .orElse(null);
+
+        if (festival == null || festival.getCosto() == null) {
+            return 0.0;
+        }
 
         //De base se arranca con este valor, luego se suma dependiendo la superficie que usa, si usa conex electrica, montaje
         double canon = festival.getCosto().getCostoBase();

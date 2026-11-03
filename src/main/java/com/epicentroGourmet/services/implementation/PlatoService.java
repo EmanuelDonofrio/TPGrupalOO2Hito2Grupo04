@@ -4,13 +4,14 @@ import com.epicentroGourmet.entities.UnidadVenta;
 import com.epicentroGourmet.entities.Empleado;
 import com.epicentroGourmet.repositories.IEmpleadoRepository;
 import com.epicentroGourmet.repositories.IPlatoRepository;
+import com.epicentroGourmet.services.negocio.IPlatoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-public class PlatoService {
+public class PlatoService implements IPlatoService {
 
     private final IPlatoRepository platoRepository;
     private final IEmpleadoRepository empleadoRepository;
@@ -20,6 +21,7 @@ public class PlatoService {
         this.empleadoRepository = empleadoRepository;
     }
 
+    @Override
     public List<Plato> obtenerPorUnidadVenta(UnidadVenta unidadVenta) {
 
         if (unidadVenta == null) {
@@ -28,6 +30,7 @@ public class PlatoService {
         return platoRepository.findByUnidadVenta(unidadVenta);
     }
 
+    @Override
     @Transactional
     public void crear(Plato plato, String usernameResponsable) {
         Empleado responsable = empleadoRepository.findByUsuarioUsername(usernameResponsable)
@@ -44,6 +47,7 @@ public class PlatoService {
         unidadVenta.getMenu().add(platoGuardado);
     }
 
+    @Override
     @Transactional
     public void modificar(Long id, Plato datos, String usernameResponsable) {
         UnidadVenta unidadVenta = obtenerUnidadVentaResponsable(usernameResponsable);
@@ -55,6 +59,7 @@ public class PlatoService {
         platoRepository.save(plato);
     }
 
+    @Override
     @Transactional
     public void eliminar(Long id, String usernameResponsable) {
         UnidadVenta unidadVenta = obtenerUnidadVentaResponsable(usernameResponsable);
@@ -90,4 +95,37 @@ public class PlatoService {
         }
         return plato;
     }
+
+    @Override
+    public double calcularMargenPromedioMenu(List<Plato> platos){
+        if(platos == null || platos.isEmpty()){
+            return 0.0;
+        }
+
+        // Filtramos platos con precio > 0 para evitar divisiones por cero
+        return platos.stream()
+                .filter(p-> p.getPrecioVenta() > 0)
+                .mapToDouble(p -> ((p.getPrecioVenta() - p.getPrecioCosto())/ p.getPrecioVenta())* 100.0)
+                .average()
+                .orElse(0.0);
+    }
+
+    @Override
+    public List<Plato> obtenerPlatosCriticos(List<Plato> platos, double umbralPorcentual){
+        if(platos == null || platos.isEmpty()){
+            return List.of();
+        }
+
+        return platos.stream()
+                .filter(p-> p.getPrecioVenta() > 0)
+                .filter(p ->{
+                    double margen = ((p.getPrecioVenta() - p.getPrecioCosto()) / p.getPrecioVenta()) * 100.0;
+                    return margen < umbralPorcentual;
+                })
+                .toList();
+    }
+
+
+
+
 }
