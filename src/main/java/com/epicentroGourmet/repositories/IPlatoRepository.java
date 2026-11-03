@@ -15,4 +15,6 @@ public interface IPlatoRepository extends JpaRepository<Plato, Long> {
             "where unidad = :unidadVenta")
     List<Plato> findByUnidadVenta(@Param("unidadVenta") UnidadVenta unidadVenta);
 
+
+
 }

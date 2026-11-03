@@ -41,9 +41,10 @@ public class UnidadVenta {
 
     private double superficie;
 
-    private Long codigo;
+    @Column(name = "codigo", length = 10, nullable = false, unique = true)
+    private String codigo;
 
-    public UnidadVenta(Empleado responsable, String nombre, double superficie, Long codigo) {
+    public UnidadVenta(Empleado responsable, String nombre, double superficie, String codigo) {
         super();
         this.responsable = responsable;
         this.nombre = nombre;

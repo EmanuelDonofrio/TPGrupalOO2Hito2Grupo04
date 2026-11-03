@@ -19,6 +19,40 @@
             </a>
         </div>
 
+        <!-- MARGEN PROMEDIO DEL MENÚ -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-left: 5px solid #0d6efd !important;">
+                <div class="card-body py-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="badge bg-primary text-uppercase fw-bold mb-1">Margen Promedio</span>
+                        <h5 class="mb-0 fw-bold text-dark">Rentabilidad de la Carta</h5>
+                        <small class="text-muted">Calculado sobre el precio de venta vs costo</small>
+                    </div>
+                    <div class="text-end">
+                            <span class="fs-3 fw-bold text-primary"
+                                  th:text="${#numbers.formatDecimal(margenPromedio, 1, 1)} + '%'">0.0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- ALERTA DE PLATOS CRÍTICOS -->
+        <div th:if="${not #lists.isEmpty(platosCriticos)}" class="alert alert-warning border-0 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <span class="fs-4 me-3">⚠️</span>
+                <div>
+                    <h6 class="alert-heading fw-bold mb-1">Atención: Platos con margen inferior al <span th:text="${umbralAlerta} + '%'">30%</span></h6>
+                    <p class="small mb-0 text-muted">
+                        Los siguientes ítems dejan un margen reducido:
+                        <span th:each="critico, iter : ${platosCriticos}">
+                            <strong th:text="${critico.nombre}">Plato</strong><span th:if="${!iter.last}">, </span>
+                        </span>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- TARJETA DESTACADA: PLATO ESTRELLA -->
         <div th:if="${platoEstrella != null}" class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #fff9e6 0%, #fff 100%); border-left: 5px solid #f39c12 !important;">
             <div class="card-body py-3 d-flex flex-wrap justify-content-between align-items-center gap-3">

@@ -34,17 +34,20 @@ public class UnidadVentaController {
     public String procesarRegistro(@Valid @ModelAttribute("unidadDTO") RegistroUnidadVentaDTO dto,
                                    BindingResult bindingResult,
                                    RedirectAttributes redirectAttributes,
-                                   Model model){
-        if(bindingResult.hasErrors()){
+                                   Model model) {
+        if (bindingResult.hasErrors()) {
             return "unidadVenta/registrarUnidadVenta";
         }
-        try{
+        try {
             unidadVentaService.registrarUnidadConResponsable(dto);
             redirectAttributes.addFlashAttribute("mensajeExito", "¡Unidad de venta y usuario del responsable registrados con éxito! Ya puede iniciar sesión.");
             return "redirect:/login";
+        }catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            return "unidadVenta/registrarUnidadVenta";
         }catch (Exception e){
             model.addAttribute("error", "Error al procesar el registro: " + e.getMessage());
-            return "unidadVenta/registrar";
+            return "unidadVenta/registrarUnidadVenta";
         }
     }
 }

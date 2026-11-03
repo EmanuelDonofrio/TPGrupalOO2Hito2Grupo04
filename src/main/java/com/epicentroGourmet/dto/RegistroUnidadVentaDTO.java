@@ -22,8 +22,7 @@ public class RegistroUnidadVentaDTO {
     @Positive(message = "La superficie debe ser mayor a 0")
     private Double superficie;
 
-    @NotBlank(message = "El código es obligatorio")
-    @Size(min = 10, max = 10, message="El código debe tener exactamente 10 caracteres")
+    // se autogenera en el service
     private String codigo;
 
     @NotBlank( message = "Debe seleccionar un tipo de unidad")

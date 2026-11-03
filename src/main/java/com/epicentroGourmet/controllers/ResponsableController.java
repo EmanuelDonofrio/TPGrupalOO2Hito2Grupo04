@@ -186,6 +186,16 @@ public class ResponsableController {
         ModelAndView modelAndView = new ModelAndView(ViewRouteHelper.RESPONSABLE_PLATOS);
         modelAndView.addObject("platos", platos);
 
+        // --- Margen de Ganancia Promedio del Menú
+        double margenPromedio = platoService.calcularMargenPromedioMenu(platos);
+        modelAndView.addObject("margenPromedio", margenPromedio);
+
+        // --- Platos críticos (Margen inferior al 30%)
+        double umbralAlerta = 30.0;
+        List<Plato> platosCriticos = platoService.obtenerPlatosCriticos(platos, umbralAlerta);
+        modelAndView.addObject("platosCriticos", platosCriticos);
+        modelAndView.addObject("umbralAlerta", umbralAlerta);
+
         // Caso de uso: Plato Estrella
         if(unidad != null){
             Festival festival = unidad.getFestivales().stream().findFirst().orElse(null);
@@ -309,6 +319,11 @@ public class ResponsableController {
                     }
                 }
 
+            }else{
+                // Valores neutros por defecto si la unidad es nueva y aún no participa en ningún festival
+                modelAndView.addObject("canon", 0.0);
+                modelAndView.addObject("reporteVenta", new ReporteVentaDTO("Sin festival asignado", BigDecimal.ZERO));
+                modelAndView.addObject("rentabilidadNeta", BigDecimal.ZERO);
             }
 
 

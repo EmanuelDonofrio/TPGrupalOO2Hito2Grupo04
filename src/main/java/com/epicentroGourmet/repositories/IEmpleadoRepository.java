@@ -16,6 +16,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
 
+
+    Optional<Empleado>findByDni(Long dni);
+    boolean existsByDni(Long dni);
     //Se agrega Usuario antes de Username ya que el atributo Username no es de
     //empleado directamente, sino del Usuario del empleado
     Optional<Empleado> findByUsuarioUsername(String username);
