@@ -2,6 +2,7 @@ package com.epicentroGourmet.services;
 
 import com.epicentroGourmet.dto.PlatoDTO;
 import com.epicentroGourmet.dto.RegistroUnidadVentaDTO;
+import com.epicentroGourmet.dto.ReporteMayoresCanonDTO;
 import com.epicentroGourmet.dto.ReporteVentaDTO;
 import com.epicentroGourmet.entities.Plato;
 import com.epicentroGourmet.entities.UnidadVenta;
@@ -24,8 +25,6 @@ public interface IUnidadVentaService {
 
     PlatoDTO obtenerPlatoEstrella(Long idUnidadVenta, Long idFestival);
 
-
-
-
+    List<ReporteMayoresCanonDTO> obtenerUnidadesConMayorCanon(Long idFestival, int cantidad);
     
 }
