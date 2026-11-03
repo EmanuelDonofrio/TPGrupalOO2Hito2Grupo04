@@ -1,6 +1,7 @@
 package com.epicentroGourmet.controllers;
 
 import com.epicentroGourmet.entities.Cajero;
+import com.epicentroGourmet.services.implementation.CierreCajaService;
 import com.epicentroGourmet.entities.Empleado;
 import com.epicentroGourmet.entities.UnidadVenta;
 import com.epicentroGourmet.entities.User;
@@ -25,15 +26,17 @@ public class PedidoController {
     private final IUserRepository userRepository;
     private final IPlatoRepository platoRepository;
     private final PedidoService pedidoService;
+    private final CierreCajaService cierreCajaService;
 
     public PedidoController(
             IUserRepository userRepository,
             IPlatoRepository platoRepository,
-            PedidoService pedidoService) {
+            PedidoService pedidoService, CierreCajaService cierreCajaService) {
 
         this.userRepository = userRepository;
         this.platoRepository = platoRepository;
         this.pedidoService = pedidoService;
+        this.cierreCajaService = cierreCajaService;
     }
 
     @GetMapping("/nuevo")
@@ -46,6 +49,7 @@ public class PedidoController {
                 !(user.getEmpleado() instanceof Cajero)) {
             return new ModelAndView("redirect:/empleado/mi-informacion");
         }
+        
 
         Empleado empleado = user.getEmpleado();
         UnidadVenta unidad = empleado.getUnidadVentaACargo();
@@ -57,6 +61,8 @@ public class PedidoController {
             mav.addObject("platos", List.of());
             return mav;
         }
+        
+        boolean cajaCerrada = !cierreCajaService.cajaAbierta(unidad);
 
         ModelAndView mav =
                 new ModelAndView("empleado/nuevo-pedido");
@@ -64,6 +70,7 @@ public class PedidoController {
         mav.addObject("unidad", unidad);
         mav.addObject("platos",
                 platoRepository.findByUnidadVenta(unidad));
+        mav.addObject("cajaCerrada", cajaCerrada);
 
         return mav;
     }

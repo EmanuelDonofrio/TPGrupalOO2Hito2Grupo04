@@ -53,6 +53,18 @@
 <div class="contenedor">
 
     <h1>Nuevo Pedido</h1>
+	
+	<div th:if="${cajaCerrada}"
+	     style="background-color: #f8d7da;
+	            color: #842029;
+	            padding: 15px;
+	            border-radius: 6px;
+	            margin: 20px 0;">
+
+	    La caja está cerrada.
+	    Debés abrirla para poder generar pedidos.
+
+	</div>
 
     <p th:if="${unidad != null}">
         Unidad de venta:
@@ -65,9 +77,9 @@
     <p class="exito" th:if="${exito}"
        th:text="${exito}"></p>
 
-    <form th:action="@{/empleado/pedidos/crear}"
-          method="post"
-          th:if="${unidad != null and !#lists.isEmpty(platos)}">
+	   <form th:action="@{/empleado/pedidos/crear}"
+	         method="post"
+	         th:if="${unidad != null and !#lists.isEmpty(platos) and !cajaCerrada}">
 
         <table>
             <thead>

@@ -23,12 +23,17 @@ public class Pedido {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUnidadVenta")
     private UnidadVenta puesto;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idCierreCaja")
+    private CierreCaja cierreCaja;
 
     //Un pedido tiene muchos detalles pedidos y un detalle pedido pertenece a un unico pedido
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido")
     private Set<DetallePedido> detallesPedidos = new HashSet<>();
 
     private double total;
+    
 
     public Pedido(UnidadVenta puesto, double total) {
         this.puesto = puesto;

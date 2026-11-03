@@ -11,6 +11,7 @@ import com.epicentroGourmet.entities.Pedido;
 import com.epicentroGourmet.entities.Plato;
 import com.epicentroGourmet.entities.UnidadVenta;
 import com.epicentroGourmet.entities.User;
+import com.epicentroGourmet.entities.CierreCaja;
 import java.util.ArrayList;
 import com.epicentroGourmet.repositories.IDetallePedidoRepository;
 import com.epicentroGourmet.repositories.IPedidoRepository;
@@ -24,17 +25,19 @@ public class PedidoService {
     private final IDetallePedidoRepository detalleRepository;
     private final IPlatoRepository platoRepository;
     private final IUserRepository userRepository;
+    private final CierreCajaService cierreCajaService;
 
     public PedidoService(
             IPedidoRepository pedidoRepository,
             IDetallePedidoRepository detalleRepository,
             IPlatoRepository platoRepository,
-            IUserRepository userRepository) {
+            IUserRepository userRepository, CierreCajaService cierreCajaService) {
 
         this.pedidoRepository = pedidoRepository;
         this.detalleRepository = detalleRepository;
         this.platoRepository = platoRepository;
         this.userRepository = userRepository;
+        this.cierreCajaService = cierreCajaService;
     }
 
     @Transactional
@@ -59,7 +62,8 @@ public class PedidoService {
             throw new IllegalArgumentException(
                     "El cajero no tiene una unidad de venta asignada");
         }
-
+        
+        CierreCaja caja = cierreCajaService.obtenerCajaAbierta(unidad);
         if (idsPlatos == null || cantidades == null ||
                 idsPlatos.isEmpty() ||
                 idsPlatos.size() != cantidades.size()) {
@@ -165,10 +169,12 @@ public class PedidoService {
                     cantidad,
                     subtotal
             );
-
+            pedido.setCierreCaja(caja);
             detalleRepository.save(detalle);
         }
 
         return pedido;
     }
+    
+    
 }
