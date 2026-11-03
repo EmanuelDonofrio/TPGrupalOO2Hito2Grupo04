@@ -7,11 +7,12 @@ import com.epicentroGourmet.entities.*;
 import com.epicentroGourmet.repositories.*;
 import com.epicentroGourmet.services.IUnidadVentaService;
 import org.hibernate.Hibernate;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.epicentroGourmet.dto.ReporteMayoresCanonDTO;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -344,6 +345,90 @@ public class UnidadVentaService implements IUnidadVentaService {
         );
 
         return new ReporteVentaDTO(nombreFestival, recaudacionTotal);
+    }
+
+    private double calcularCanonParaFestival(UnidadVenta unidadVenta, Festival festival) {
+
+        if (unidadVenta == null || festival == null) {
+            throw new IllegalArgumentException(
+                "La unidad de venta y el festival son obligatorios."
+            );
+        }
+
+        UnidadVenta unidadVentaReal = Hibernate.unproxy(unidadVenta, UnidadVenta.class);
+
+        double canon = festival.getCosto().getCostoBase();
+
+        if (unidadVentaReal instanceof FoodTruck foodTruck) {
+
+            canon += foodTruck.getSuperficie()
+                    * festival.getCosto().getCostoSuperficie();
+
+            if (foodTruck.isConexionElectrica()) {
+                canon += festival.getCosto().getCostoElectricidad();
+            }
+
+        } else if (unidadVentaReal instanceof PuestoDesarmable puestoDesarmable) {
+
+            canon += puestoDesarmable.getSuperficie()
+                    * festival.getCosto().getCostoSuperficie();
+
+            canon -= puestoDesarmable.getTiempoMontaje()
+                    * festival.getCosto().getCostoMontaje();
+        }
+
+        return canon;
+    }
+
+    public List<ReporteMayoresCanonDTO> obtenerUnidadesConMayorCanon(Long idFestival, int cantidad) {
+
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa.");
+        }
+
+        Festival festival = festivalRepository.findById(idFestival)
+                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado."));
+
+        List<UnidadVenta> unidades =
+                unidadVentaRepository.findByFestivales_IdFestival(idFestival);
+
+        List<ReporteMayoresCanonDTO> reporte = new ArrayList<>();
+
+        for (UnidadVenta unidad : unidades) {
+
+            double canon = calcularCanonParaFestival(unidad, festival);
+
+            String tipoUnidad;
+
+            UnidadVenta unidadReal = Hibernate.unproxy(unidad, UnidadVenta.class);
+
+            if (unidadReal instanceof FoodTruck) {
+                tipoUnidad = "FoodTruck";
+            } else if (unidadReal instanceof PuestoDesarmable) {
+                tipoUnidad = "PuestoDesarmable";
+            } else {
+                tipoUnidad = "Desconocido";
+            }
+
+            ReporteMayoresCanonDTO dto = new ReporteMayoresCanonDTO(
+                    unidad.getNombre(),
+                    unidad.getCodigo(),
+                    tipoUnidad,
+                    canon
+            );
+
+            reporte.add(dto);
+        }
+
+        reporte.sort(Comparator.comparing(ReporteMayoresCanonDTO::getCanon).reversed());
+
+        if (cantidad == 0) {
+            return reporte;
+        }
+
+        return reporte.stream()
+            .limit(cantidad)
+            .collect(Collectors.toList());
     }
 
 }

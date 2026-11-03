@@ -4,12 +4,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.epicentroGourmet.services.IFestivalService;
 import com.epicentroGourmet.services.implementation.UnidadVentaService;
-import com.epicentroGourmet.repositories.RankingUnidadProjection;
-import java.util.List;
 
 @Controller
 @RequestMapping("/administrador")
@@ -62,6 +61,35 @@ public class AdminController {
 			"ranking",
 			unidadVentaService.obtenerRankingPorFestival(id)
 		);
+
+		return mav;
+	}
+
+	//VOLVER A FESTIVALES DESDE RANING
+	@GetMapping("/{id}/volver")
+	public ModelAndView volverAFestivales(@PathVariable Long id) {
+		ModelAndView mav = new ModelAndView("redirect:/administrador/home_admin");
+		return mav;
+	}
+
+	// VER UNIDADES CON MAYOR CANON POR FESTIVAL
+	@GetMapping("/{id}/mayores-canon")
+	public ModelAndView verMayoresCanon(
+			@PathVariable Long id,
+			@RequestParam(defaultValue = "3") int cantidad) {
+
+		ModelAndView mav = new ModelAndView("administrador/mayoresCanon");
+
+		mav.addObject("festival", festivalService.getAll()
+				.stream()
+				.filter(f -> f.getIdFestival().equals(id))
+				.findFirst()
+				.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
+
+		mav.addObject("unidades",
+				unidadVentaService.obtenerUnidadesConMayorCanon(id, cantidad));
+
+		mav.addObject("cantidad", cantidad);
 
 		return mav;
 	}

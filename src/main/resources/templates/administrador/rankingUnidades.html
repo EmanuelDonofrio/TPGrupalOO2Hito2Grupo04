@@ -30,10 +30,11 @@
     </div>
 
     <!-- Grilla del ranking -->
+    <!-- Listado de unidades ordenadas por recaudación -->
     <div class="card shadow-sm border-0">
 
         <div class="card-header bg-dark text-white py-3">
-            <h4 class="mb-0 fs-5">Ranking por recaudación</h4>
+            <h4 class="mb-0 fs-5">Unidades ordenadas por recaudación</h4>
         </div>
 
         <div class="card-body p-0">
@@ -43,9 +44,9 @@
 
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Posición</th>
+                            <th class="ps-4">N°</th>
                             <th>Unidad de venta</th>
-                            <th class="text-end pe-4">Recaudación</th>
+                            <th class="text-end pe-4">Recaudación total</th>
                         </tr>
                     </thead>
 
@@ -53,11 +54,9 @@
 
                         <tr th:each="unidad, iterStat : ${ranking}">
 
-                            <td class="ps-4">
-                                <span th:text="${iterStat.count}">1</span>
-                                <span th:if="${iterStat.count == 1}">🥇</span>
-                                <span th:if="${iterStat.count == 2}">🥈</span>
-                                <span th:if="${iterStat.count == 3}">🥉</span>
+                            <td class="ps-4 text-muted"
+                                th:text="${iterStat.count}">
+                                1
                             </td>
 
                             <td class="fw-semibold"
@@ -65,7 +64,7 @@
                                 Nombre de la unidad
                             </td>
 
-                            <td class="text-end pe-4 fw-bold text-success"
+                            <td class="text-end pe-4 fw-bold"
                                 th:text="${#numbers.formatDecimal(unidad.recaudacion, 1, 'POINT', 2, 'COMMA')}">
                                 125.000,00
                             </td>
@@ -74,7 +73,7 @@
 
                         <tr th:if="${ranking == null or #lists.isEmpty(ranking)}">
                             <td colspan="3" class="text-center py-4 text-muted">
-                                No hay unidades de venta para mostrar en el ranking.
+                                No hay unidades de venta para mostrar.
                             </td>
                         </tr>
 
@@ -88,7 +87,7 @@
 
     <!-- Botón volver -->
     <div class="mt-4">
-        <a th:href="@{/admin/festivales}"
+        <a th:href="@{/administrador/{id}/volver(id=${festival.idFestival})}"
            class="btn btn-outline-secondary">
             Volver a festivales
         </a>

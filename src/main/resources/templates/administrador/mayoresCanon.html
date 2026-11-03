@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}"></head>
+
+<body>
+
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-4">
+
+    <!-- Encabezado -->
+    <div class="row align-items-center mb-4 pb-3 border-bottom">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-dark">
+                Unidades con Mayor Canon
+            </h1>
+
+            <p class="lead text-muted mb-0">
+                Unidades que más gastaron en canon para participar del festival.
+            </p>
+        </div>
+    </div>
+
+    <!-- Información del festival -->
+    <div class="alert alert-info mb-4">
+        <strong>Festival:</strong>
+        <span th:text="${festival.nombre}">Nombre del festival</span>
+    </div>
+
+    <!-- Filtro de cantidad -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get"
+                  th:action="@{/administrador/{id}/mayores-canon(id=${festival.idFestival})}">
+
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="cantidad" class="form-label fw-semibold">
+                            Cantidad de unidades a mostrar
+                        </label>
+
+                        <select id="cantidad"
+                                name="cantidad"
+                                class="form-select"
+                                onchange="this.form.submit()">
+
+                            <option value="3"
+                                    th:selected="${cantidad == 3}">
+                                Top 3
+                            </option>
+
+                            <option value="5"
+                                    th:selected="${cantidad == 5}">
+                                Top 5
+                            </option>
+
+                            <option value="10"
+                                    th:selected="${cantidad == 10}">
+                                Top 10
+                            </option>
+
+                            <option value="0"
+                                    th:selected="${cantidad == 0}">
+                                Todas
+                            </option>
+
+                        </select>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla del reporte -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-dark text-white py-3">
+            <h4 class="mb-0 fs-5">
+                Unidades ordenadas por canon
+            </h4>
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">N°</th>
+                            <th>Nombre comercial</th>
+                            <th>Código</th>
+                            <th>Tipo de unidad</th>
+                            <th class="text-end pe-4">Canon</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="unidad, iterStat : ${unidades}">
+
+                            <td class="ps-4 text-muted"
+                                th:text="${iterStat.count}">
+                                1
+                            </td>
+
+                            <td class="fw-semibold"
+                                th:text="${unidad.nombreUnidadVenta}">
+                                Nombre comercial
+                            </td>
+
+                            <td th:text="${unidad.codigo}">
+                                102
+                            </td>
+
+                            <td th:text="${unidad.tipoUnidadVenta}">
+                                FoodTruck
+                            </td>
+
+                            <td class="text-end pe-4 fw-bold"
+                                th:text="${#numbers.formatDecimal(unidad.canon, 1, 'POINT', 2, 'COMMA')}">
+                                150.000,00
+                            </td>
+
+                        </tr>
+
+                        <tr th:if="${unidades == null or #lists.isEmpty(unidades)}">
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                No hay unidades de venta para mostrar.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Botón volver -->
+    <div class="mt-4">
+        <a th:href="@{/administrador/{id}/volver(id=${festival.idFestival})}"
+           class="btn btn-outline-secondary">
+            Volver a festivales
+        </a>
+    </div>
+
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+<div th:replace="~{layout :: scripts}"></div>
+
+</body>
+</html>
