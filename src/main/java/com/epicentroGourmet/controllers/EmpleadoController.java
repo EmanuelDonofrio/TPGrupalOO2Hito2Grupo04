@@ -1,6 +1,8 @@
 package com.epicentroGourmet.controllers;
 
 import java.time.LocalDate;
+import com.epicentroGourmet.services.implementation.CierreCajaService;
+import com.epicentroGourmet.entities.Cajero;
 import com.epicentroGourmet.dto.EmpleadoDTOForm;
 import com.epicentroGourmet.entities.*;
 import com.epicentroGourmet.helpers.ViewRouteHelper;
@@ -38,12 +40,14 @@ public class EmpleadoController {
     private final IFestivalService festivalService;
     private final EmpleadoService empleadoService;
     private final ReciboSueldoPdfService reciboSueldoPdfService;
+    private final CierreCajaService cierreCajaService;
 
-    public EmpleadoController(IUserRepository userRepository, IFestivalService festivalService, EmpleadoService empleadoService, ReciboSueldoPdfService reciboSueldoPdfService) {
+    public EmpleadoController(IUserRepository userRepository, IFestivalService festivalService, EmpleadoService empleadoService, ReciboSueldoPdfService reciboSueldoPdfService, CierreCajaService cierreCajaService) {
         this.userRepository = userRepository;
         this.festivalService = festivalService;
         this.empleadoService = empleadoService;
         this.reciboSueldoPdfService = reciboSueldoPdfService;
+        this.cierreCajaService = cierreCajaService;
     }
 
     // 1. Ver su información personal, unidad y festivales
@@ -58,6 +62,10 @@ public class EmpleadoController {
             mav.addObject("hoy", LocalDate.now());
             mav.addObject("empleado", empleado);
             mav.addObject("unidad", unidad);
+            if (empleado instanceof Cajero && unidad != null) {
+                mav.addObject("cajaAbierta",
+                    cierreCajaService.cajaAbierta(unidad));
+            }
 
             if (unidad != null){
             	List<Festival> festivales = festivalService.traerFestivalesPorUnidad(unidad.getIdUnidadVenta());

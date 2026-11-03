@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cierre de caja - Epicentro Gourmet</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .contenedor {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .resumen {
+            display: flex;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .tarjeta {
+            flex: 1;
+            background: #eef3f8;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .tarjeta h2 {
+            margin: 0;
+            color: #198754;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+
+        .boton {
+            background: #198754;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .boton:hover {
+            background: #146c43;
+        }
+
+        .boton-cerrar {
+            background-color: #dc3545;
+        }
+
+        .boton-cerrar:hover {
+            background-color: #bb2d3b;
+        }
+
+        .mensaje {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .exito {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .estado {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .estado-abierta {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .estado-cerrada {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .volver {
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <h1>Gestión de caja</h1>
+
+    <p>
+        Desde esta sección podés abrir y cerrar
+        la caja de tu unidad de venta.
+    </p>
+
+
+    <div th:if="${exito}"
+         class="mensaje exito"
+         th:text="${exito}">
+    </div>
+
+    <div th:if="${error}"
+         class="mensaje error"
+         th:text="${error}">
+    </div>
+
+
+    <div th:if="${error == null and cajaAbierta == true}"
+         class="estado estado-abierta">
+        Estado de la caja: ABIERTA
+    </div>
+
+    <div th:if="${error == null and cajaAbierta == false}"
+         class="estado estado-cerrada">
+        Estado de la caja: CERRADA
+    </div>
+
+    <!-- Contenido visible cuando la caja está abierta -->
+
+    <div th:if="${cajaAbierta == true}">
+
+        <h2>Resumen de caja</h2>
+
+        <div class="resumen">
+
+            <div class="tarjeta">
+                <p>Pedidos pendientes</p>
+                <h2 th:text="${cantidadPedidos}">0</h2>
+            </div>
+
+            <div class="tarjeta">
+                <p>Total de pedidos</p>
+                <h2 th:text="'$ ' + ${total}">$ 0</h2>
+            </div>
+
+        </div>
+
+        <h3>Detalle de pedidos</h3>
+
+        <table th:if="${!#lists.isEmpty(pedidos)}">
+            <thead>
+                <tr>
+                    <th>ID Pedido</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido.idPedido}"></td>
+                    <td th:text="${pedido.fechaCreacion}"></td>
+                    <td th:text="${pedido.total}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p th:if="${#lists.isEmpty(pedidos)}">
+            Todavía no hay pedidos registrados
+            para este cierre.
+        </p>
+
+        <!-- Botón para cerrar caja -->
+
+        <form th:action="@{/empleado/caja/confirmar}"
+              method="post"
+              onsubmit="return confirm('¿Confirmar el cierre de caja?');">
+
+            <button type="submit"
+                    class="boton boton-cerrar">
+                Cerrar caja
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Contenido visible cuando la caja está cerrada -->
+
+    <div th:if="${cajaAbierta == false and error == null}">
+
+        <p>
+            La caja se encuentra cerrada.
+            Para registrar nuevos pedidos,
+            primero debés abrirla.
+        </p>
+
+        <!-- Botón para abrir caja -->
+
+        <form th:action="@{/empleado/caja/abrir}"
+              method="post">
+
+            <button type="submit" class="boton">
+                Abrir caja
+            </button>
+
+        </form>
+
+    </div>
+
+    <br>
+
+    <a th:href="@{/empleado/mi-informacion}"
+       class="volver">
+        Volver a Mi Información
+    </a>
+
+</div>
+
+</body>
+</html>
+

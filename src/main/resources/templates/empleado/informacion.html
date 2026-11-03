@@ -93,8 +93,24 @@
 		         ">
 		          Nuevo Pedido
 		      </a>
+			
+		  </div>
+		  
+
+		  <div th:if="${empleado instanceof T(com.epicentroGourmet.entities.Cajero)}"
+		       style="margin: 20px 0;">
+
+		      <a th:href="@{/empleado/caja/cerrar}"
+		         th:text="${cajaAbierta == true} ? 'Cerrar caja' : 'Abrir caja'"
+		         th:style="${cajaAbierta == true}
+		             ? 'display:inline-block; padding:12px 20px; background-color:#dc3545; color:white; text-decoration:none; border-radius:6px; font-weight:bold;'
+		             : 'display:inline-block; padding:12px 20px; background-color:#198754; color:white; text-decoration:none; border-radius:6px; font-weight:bold;'">
+		          Gestión de caja
+		      </a>
 
 		  </div>
+
+		  
 		  <div th:if="${festivalActual == null}"
 		       class="alert alert-secondary mb-4">
 
