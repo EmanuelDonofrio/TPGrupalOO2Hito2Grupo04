@@ -78,7 +78,23 @@
 		          <span th:text="${#temporals.format(festivalActual.fechaFin, 'dd/MM/yyyy')}"></span>
 		      </p>
 		  </div>
+		  <div th:if="${empleado instanceof T(com.epicentroGourmet.entities.Cajero)}"
+		       style="margin: 20px 0;">
 
+		      <a th:href="@{/empleado/pedidos/nuevo}"
+		         style="
+		             display: inline-block;
+		             padding: 12px 20px;
+		             background-color: #198754;
+		             color: white;
+		             text-decoration: none;
+		             border-radius: 6px;
+		             font-weight: bold;
+		         ">
+		          Nuevo Pedido
+		      </a>
+
+		  </div>
 		  <div th:if="${festivalActual == null}"
 		       class="alert alert-secondary mb-4">
 

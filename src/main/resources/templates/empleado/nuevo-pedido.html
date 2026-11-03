@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Pedido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 30px;
+        }
+
+        .contenedor {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 6px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #198754;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .error { color: red; }
+        .exito { color: green; }
+    </style>
+</head>
+<body>
+
+<div class="contenedor">
+
+    <h1>Nuevo Pedido</h1>
+
+    <p th:if="${unidad != null}">
+        Unidad de venta:
+        <strong th:text="${unidad.nombre}"></strong>
+    </p>
+
+    <p class="error" th:if="${error}"
+       th:text="${error}"></p>
+
+    <p class="exito" th:if="${exito}"
+       th:text="${exito}"></p>
+
+    <form th:action="@{/empleado/pedidos/crear}"
+          method="post"
+          th:if="${unidad != null and !#lists.isEmpty(platos)}">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Plato</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="plato : ${platos}">
+
+                    <td th:text="${plato.nombre}"></td>
+
+                    <td th:text="${plato.precioVenta}"></td>
+
+                    <td>
+                        <input type="hidden"
+                               name="idsPlatos"
+                               th:value="${plato.idPlato}">
+
+                        <input type="number"
+                               name="cantidades"
+                               min="0"
+                               value="0"
+                               required>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+        <button type="submit">
+            Confirmar pedido
+        </button>
+
+    </form>
+
+    <p th:if="${unidad != null and #lists.isEmpty(platos)}">
+        No hay platos disponibles para esta unidad de venta.
+    </p>
+
+    <a th:href="@{/empleado/mi-informacion}">
+        Volver a Mi Información
+    </a>
+
+</div>
+
+</body>
+</html>
