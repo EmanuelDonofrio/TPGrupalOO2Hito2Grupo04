@@ -139,11 +139,14 @@ La aplicación implementa variables de entorno para evitar la exposición de cre
 
 
 ### Integrante: Angel Valentin Altieri (@angelvalentinn)
- 1. Caso de uso 1:
-      -Actor:
-      -Descripción:
-      -Link al Pull Request:
+ 1. Caso de uso 1: Alta, baja  y visualización de empleados desde el perfil de responsable
+ 2. Caso de uso 2: Envio de mail al dar de alta un empleado
+ 3. Caso de uso 3: Filtro por dni y atributos del empleado
+ 4. Caso de uso 4: Calculo de canon. Método que devuelve el monto que tiene que pagar la unidad de venta
+ 5. Caso de uso 5: Reporte de recaudación. Retorna la recaudación total bruta de la unidad de venta
+ 6. Caso de uso 6: Alta y modificación de platos
 
+- Link a los PR (entre los pr hay algunos fixes): https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pulls?q=is%3Apr+state%3Aclosed+author%3Aangelvalentinn
 
 ### Integrante: Iara Yael Aznar (@IaraAznar)
  1. Caso de uso 1:
