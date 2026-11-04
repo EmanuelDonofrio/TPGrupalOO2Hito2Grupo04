@@ -29,4 +29,19 @@ public interface IUnidadVentaRepository extends JpaRepository<UnidadVenta, Long>
         @Param("idFestival") Long idFestival
     );
 
+    @Query("""
+        SELECT uv
+        FROM UnidadVenta uv
+        WHERE NOT EXISTS (
+            SELECT f.idFestival
+            FROM Festival f
+            JOIN f.unidadesDeVenta unidad
+            WHERE f.idFestival = :idFestival
+            AND unidad.idUnidadVenta = uv.idUnidadVenta
+        )
+        """)
+    List<UnidadVenta> findDisponiblesParaFestival(
+        @Param("idFestival") Long idFestival
+    );
+
 }

@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.epicentroGourmet.services.IFestivalService;
 import com.epicentroGourmet.services.implementation.UnidadVentaService;
+import java.util.List;
 
 @Controller
 @RequestMapping("/administrador")
@@ -38,6 +40,11 @@ public class AdminController {
 		ModelAndView mav = new ModelAndView("administrador/unidadesVenta");
 
 		mav.addObject("unidades", unidadVentaService.listarPorFestival(id));
+
+		mav.addObject("festival", festivalService.getAll().stream()
+			.filter(f -> f.getIdFestival().equals(id))
+			.findFirst()
+			.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
 
 		return mav;
 	}
@@ -92,6 +99,32 @@ public class AdminController {
 		mav.addObject("cantidad", cantidad);
 
 		return mav;
+	}
+
+	@GetMapping("/{id}/asignar-unidades")
+	public ModelAndView verUnidadesDisponibles(@PathVariable Long id) {
+
+		ModelAndView mav = new ModelAndView("administrador/asignarUnidades");
+
+		mav.addObject("festival", festivalService.getAll().stream()
+				.filter(f -> f.getIdFestival().equals(id))
+				.findFirst()
+				.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
+
+		mav.addObject("unidades",
+				unidadVentaService.obtenerUnidadesDisponiblesParaFestival(id));
+
+		return mav;
+	}
+
+	@PostMapping("/{id}/asignar-unidades")
+	public String asignarUnidades(
+			@PathVariable Long id,
+			@RequestParam(name = "unidadesSeleccionadas", required = false) List<Long> idsUnidades) {
+
+		unidadVentaService.asignarUnidadesAFestival(id, idsUnidades);
+
+		return "redirect:/administrador/" + id + "/unidades";
 	}
 
 }

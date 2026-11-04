@@ -286,3 +286,10 @@ footer {
         font-size: 0.9rem;
     }
 }
+
+.checkbox-unidad {
+    transform: scale(1.3);
+    cursor: pointer;
+    margin-top: -0.3rem;
+    margin-left: -1.8rem;
+}

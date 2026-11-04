@@ -431,4 +431,45 @@ public class UnidadVentaService implements IUnidadVentaService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public List<UnidadVenta> obtenerUnidadesDisponiblesParaFestival(Long idFestival) {
+        return unidadVentaRepository.findDisponiblesParaFestival(idFestival);
+    }
+
+    @Override
+    @Transactional
+    public void asignarUnidadesAFestival(Long idFestival, List<Long> idsUnidades) {
+
+        // Validar que se hayan seleccionado unidades
+        if (idsUnidades == null || idsUnidades.isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar al menos una unidad.");
+        }
+
+        // Buscar el festival
+        Festival festival = festivalRepository.findById(idFestival)
+                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado."));
+
+        // Eliminar posibles IDs repetidos
+        List<Long> idsUnicos = idsUnidades.stream()
+                .distinct()
+                .toList();
+
+        // Buscar las unidades seleccionadas
+        List<UnidadVenta> unidades = unidadVentaRepository.findAllById(idsUnicos);
+
+        // Validar que todos los IDs correspondan a unidades existentes
+        if (unidades.size() != idsUnicos.size()) {
+            throw new IllegalArgumentException("Una o más unidades no existen.");
+        }
+
+        // Establecer la relación entre el festival y las unidades
+        for (UnidadVenta unidad : unidades) {
+            festival.getUnidadesDeVenta().add(unidad);
+            unidad.getFestivales().add(festival);
+        }
+
+        // Guardar el festival (lado propietario de la relación)
+        festivalRepository.save(festival);
+    }
+
 }

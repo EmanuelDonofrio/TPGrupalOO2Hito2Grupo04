@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<main class="container py-5">
+
+    <!-- Encabezado -->
+    <div class="row align-items-center mb-4 pb-3 border-bottom">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-dark">Asignar unidades de venta</h1>
+            <p class="lead text-muted mb-0">
+                Seleccioná las unidades existentes que querés incorporar al festival.
+            </p>
+        </div>
+    </div>
+
+    <!-- Información del festival -->
+    <div class="alert alert-info mb-4">
+        <strong>Festival:</strong>
+        <span th:text="${festival.nombre}">Nombre del festival</span>
+    </div>
+
+    <form th:action="@{/administrador/{id}/asignar-unidades(id=${festival.idFestival})}"
+      method="post">
+      
+        <!-- Listado de unidades disponibles -->
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fs-5">Unidades disponibles</h4>
+                <span class="badge bg-primary"
+                    th:text="${unidades != null ? unidades.size() : 0} + ' disponibles'">
+                    0 disponibles
+                </span>
+            </div>
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Seleccionar</th>
+                                <th>Nombre comercial</th>
+                                <th>Código</th>
+                                <th>Tipo de unidad</th>
+                                <th>Superficie</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="unidad : ${unidades}">
+
+                                <td class="text-center align-middle">
+                                    <input type="checkbox" class="form-check-input checkbox-unidad"
+                                        name="unidadesSeleccionadas"
+                                        th:value="${unidad.idUnidadVenta}">
+                                </td>
+
+                                <td class="fw-semibold"
+                                    th:text="${unidad.nombre}">
+                                    Nombre comercial
+                                </td>
+
+                                <td th:text="${unidad.codigo}">
+                                    Código
+                                </td>
+
+                                <td>
+                                    <span th:if="${unidad instanceof T(com.epicentroGourmet.entities.FoodTruck)}"
+                                        class="badge bg-primary">
+                                        Food Truck
+                                    </span>
+
+                                    <span th:if="${unidad instanceof T(com.epicentroGourmet.entities.PuestoDesarmable)}"
+                                        class="badge bg-secondary">
+                                        Puesto Desarmable
+                                    </span>
+                                </td>
+
+                                <td th:text="${unidad.superficie + ' m²'}">
+                                    10 m²
+                                </td>
+
+                            </tr>
+
+                            <tr th:if="${unidades == null or #lists.isEmpty(unidades)}">
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+                                    No hay unidades disponibles para asignar a este festival.
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <a th:href="@{/administrador/{id}/unidades(id=${festival.idFestival})}"
+                class="btn btn-outline-secondary">
+                    Volver
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Confirmar asignación
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+<div th:replace="~{layout :: scripts}"></div>
+
+</body>
+</html>
