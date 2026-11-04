@@ -13,6 +13,7 @@ import java.util.List;
 
 public interface IUnidadVentaService {
     void registrarUnidadConResponsable(RegistroUnidadVentaDTO dto) throws Exception;
+    void registrarUnidadConResponsableEnFestival( RegistroUnidadVentaDTO dto, Long idFestival) throws Exception;
     List<UnidadVenta> listarTodas();
     List<RankingUnidadProjection> obtenerRankingPorFestival(Long idFestival);
 
@@ -28,6 +29,5 @@ public interface IUnidadVentaService {
 
     List<UnidadVenta> obtenerUnidadesDisponiblesParaFestival(Long idFestival);
 
-    void asignarUnidadesAFestival(Long idFestival, List<Long> idsUnidades);
-    
+    void asignarUnidadesAFestival(Long idFestival, List<Long> idsUnidades); 
 }

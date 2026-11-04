@@ -12,6 +12,14 @@ import com.epicentroGourmet.services.IFestivalService;
 import com.epicentroGourmet.services.implementation.UnidadVentaService;
 import java.util.List;
 
+import jakarta.validation.Valid;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.epicentroGourmet.dto.RegistroUnidadVentaDTO;
+
 @Controller
 @RequestMapping("/administrador")
 public class AdminController {
@@ -125,6 +133,75 @@ public class AdminController {
 		unidadVentaService.asignarUnidadesAFestival(id, idsUnidades);
 
 		return "redirect:/administrador/" + id + "/unidades";
+	}
+
+	// MOSTRAR FORMULARIO PARA CREAR UNA UNIDAD DESDE UN FESTIVAL
+	@GetMapping("/{id}/crear-unidad")
+	public ModelAndView mostrarFormularioCrearUnidad(@PathVariable Long id) {
+
+		ModelAndView mav = new ModelAndView("administrador/registrarUnidadFestival");
+
+		mav.addObject("festival", festivalService.getAll().stream()
+				.filter(f -> f.getIdFestival().equals(id))
+				.findFirst()
+				.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
+
+		mav.addObject("unidadDTO", new RegistroUnidadVentaDTO());
+
+		return mav;
+	}
+
+	// PROCESAR CREACIÓN DE UNIDAD Y ASOCIARLA AL FESTIVAL
+	@PostMapping("/{id}/crear-unidad")
+	public String crearUnidadParaFestival(
+			@PathVariable Long id,
+			@Valid @ModelAttribute("unidadDTO") RegistroUnidadVentaDTO dto,
+			BindingResult bindingResult,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+
+		// Si hay errores de validación, vuelve al formulario
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("festival", festivalService.getAll().stream()
+					.filter(f -> f.getIdFestival().equals(id))
+					.findFirst()
+					.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
+
+			return "administrador/registrarUnidadFestival";
+		}
+
+		try {
+			unidadVentaService.registrarUnidadConResponsableEnFestival(dto, id);
+
+			redirectAttributes.addFlashAttribute(
+					"mensajeExito",
+					"La unidad de venta y su responsable fueron registrados y asociados al festival correctamente."
+			);
+
+			return "redirect:/administrador/" + id + "/unidades";
+
+		} catch (IllegalArgumentException | IllegalStateException e) {
+
+			model.addAttribute("festival", festivalService.getAll().stream()
+					.filter(f -> f.getIdFestival().equals(id))
+					.findFirst()
+					.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
+
+			model.addAttribute("error", e.getMessage());
+
+			return "administrador/registrarUnidadFestival";
+
+		} catch (Exception e) {
+
+			model.addAttribute("festival", festivalService.getAll().stream()
+					.filter(f -> f.getIdFestival().equals(id))
+					.findFirst()
+					.orElseThrow(() -> new RuntimeException("Festival no encontrado")));
+
+			model.addAttribute("error", "Error al registrar la unidad: " + e.getMessage());
+
+			return "administrador/registrarUnidadFestival";
+		}
 	}
 
 }

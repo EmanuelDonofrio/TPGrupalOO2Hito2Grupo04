@@ -70,7 +70,30 @@ public class UnidadVentaService implements IUnidadVentaService {
     @Transactional
     public void registrarUnidadConResponsable(RegistroUnidadVentaDTO dto) throws Exception {
 
+        crearUnidadConResponsable(dto);
+    }
 
+    @Override
+    @Transactional
+    public void registrarUnidadConResponsableEnFestival(
+            RegistroUnidadVentaDTO dto,
+            Long idFestival
+    ) throws Exception {
+
+        Festival festival = festivalRepository.findById(idFestival)
+                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado."));
+
+        UnidadVenta unidad = crearUnidadConResponsable(dto);
+
+        festival.getUnidadesDeVenta().add(unidad);
+        unidad.getFestivales().add(festival);
+
+        festivalRepository.save(festival);
+    }
+
+    private UnidadVenta crearUnidadConResponsable(
+            RegistroUnidadVentaDTO dto
+    ) throws Exception {
         // --- VALIDACIONES DE NEGOCIO ---
 
         // Validar que la cuenta de usuario no exista previamente
@@ -145,6 +168,7 @@ public class UnidadVentaService implements IUnidadVentaService {
         // 5. Vinculamos la unidad creada al responsable ( clave foránea id_unidad_venta)
         responsable.setUnidadVentaACargo(unidad);
         empleadoRepository.save(responsable);
+        return unidad;
     }
 
     @Override
