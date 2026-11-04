@@ -154,13 +154,11 @@
                             Seleccionar una existente
                         </a>
 
-                        <button type="button"
-                                class="btn btn-success"
-                                data-dismiss="modal"
-                                onclick="crearUnidadNueva()">
+                        <a th:href="@{/administrador/{id}/crear-unidad(id=${festival.idFestival})}"
+                            class="btn btn-success">
                             <i class="bi bi-plus-circle me-1"></i>
                             Crear una nueva
-                        </button>
+                        </a>
 
                     </div>
 
@@ -170,21 +168,6 @@
 
         </div>
     </div>
-
-    
-    
-    <script>
-        function seleccionarUnidadExistente() {
-            alert("Próximo paso: seleccionar una unidad existente.");
-        }
-
-        function crearUnidadNueva() {
-            alert("Próximo paso: abrir el formulario de registro.");
-        }
-    </script>
-
-
-
 
 </main>
 
