@@ -191,7 +191,7 @@ public class EmpleadoService {
         //ENVIO DE MAIL
         emailService.enviarMail(
                 "TP_OO2_GRUPO04@gmail.com",
-                "aza004aa@gmail.com",
+                "luengo04@gmail.com",
                 "Epicentro Gourmet - Credenciales de acceso",
                 "Hola " + form.getNombre() + " " + form.getApellido() + ",\n\n"
                 + "¡Te damos la bienvenida a Epicentro Gourmet!\n\n"
@@ -240,7 +240,7 @@ public class EmpleadoService {
         // 16 días / 15 = 1,06 → ceil = 2 → 2 × 0,5 = 1,0  → 100%
         // 30 días / 15 = 2    → ceil = 2 → 2 × 0,5 = 1,0  → 100%
         // 31 días / 15 = 2,06 → ceil = 3 → 3 × 0,5 = 1,5  → 150%
-        return Math.ceil(cantidadDiasFestival / PoliticaSalarial.DIAS_BLOQUE_FESTIVAL) * PoliticaSalarial.PORCENTAJE_BLOQUE_FESTIVAL;
+        return Math.ceil((double) cantidadDiasFestival  / PoliticaSalarial.DIAS_BLOQUE_FESTIVAL) * PoliticaSalarial.PORCENTAJE_BLOQUE_FESTIVAL;
     }
     
     public double calcularSueldoPorFestival(
@@ -257,6 +257,17 @@ public class EmpleadoService {
             throw new IllegalArgumentException(
                     "Las fechas del festival no son válidas");
         }
+        
+        if (empleado.getFechaIngreso() != null
+                && festival.getFechaFin()
+                    .isBefore(empleado.getFechaIngreso())) {
+
+            throw new IllegalArgumentException(
+                "No se puede calcular el sueldo de un festival "
+                + "anterior al ingreso del empleado"
+            );
+        }
+        
 
         double sueldo = PoliticaSalarial.SUELDO_BASE;
 
@@ -296,6 +307,8 @@ public class EmpleadoService {
 
         return sueldo * porcentaje;
     }
+    
+    
 
 
 }

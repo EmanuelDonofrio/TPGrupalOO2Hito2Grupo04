@@ -82,6 +82,9 @@ public class PedidoController {
 
             @RequestParam(name = "cantidades", required = false)
             List<Integer> cantidades,
+            
+            @RequestParam(name = "observaciones", required = false)
+            String observaciones,
 
             Authentication authentication,
             RedirectAttributes redirectAttributes) {
@@ -90,7 +93,8 @@ public class PedidoController {
             pedidoService.crearPedido(
                     authentication.getName(),
                     idsPlatos,
-                    cantidades
+                    cantidades,
+                    observaciones
             );
 
             redirectAttributes.addFlashAttribute(

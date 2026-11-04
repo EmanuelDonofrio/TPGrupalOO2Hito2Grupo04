@@ -43,10 +43,6 @@
               <label class="text-muted small d-block">Antigüedad</label>
               <span class="fw-semibold" th:text="${empleado.antiguedad != null ? empleado.antiguedad + ' años' : '0 años'}">0 años</span>
             </div>
-            <div class="col-md-4">
-              <label class="text-muted small d-block">Sueldo Base</label>
-              <span class="fw-semibold text-success" th:text="'$' + ${#numbers.formatDecimal(empleado.sueldoBase, 1, 'POINT', 2, 'COMMA')}">$100.000,00</span>
-            </div>
           </div>
 		  
 		  <!-- TRABAJO ACTUAL -->
@@ -95,6 +91,12 @@
 		      </a>
 			
 		  </div>
+		  
+		  <a th:if="${empleado instanceof T(com.epicentroGourmet.entities.Cajero)}"
+		     th:href="@{/empleado/historial-pedidos}"
+		     class="btn btn-primary">
+		      Historial de pedidos
+		  </a>
 		  
 
 		  <div th:if="${empleado instanceof T(com.epicentroGourmet.entities.Cajero)}"

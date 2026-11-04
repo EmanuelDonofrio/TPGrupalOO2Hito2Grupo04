@@ -34,9 +34,12 @@ public class Pedido {
 
     private double total;
     
+    @Column(length = 500)
+    private String observaciones;
 
     public Pedido(UnidadVenta puesto, double total) {
         this.puesto = puesto;
         this.total = total;
     }
+    
 }

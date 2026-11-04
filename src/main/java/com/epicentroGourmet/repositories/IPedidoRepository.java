@@ -21,6 +21,19 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long > {
     List<Pedido> findByPuestoAndFechaCreacionBetween(UnidadVenta puesto, LocalDateTime desde, LocalDateTime hasta);
     List<Pedido> findByPuestoAndCierreCajaIsNull(UnidadVenta puesto);
     List<Pedido> findByCierreCaja(CierreCaja cierreCaja);
+    List<Pedido> findByPuestoOrderByIdPedidoDesc(UnidadVenta puesto);
+    
+    @Query("""
+    	    SELECT DISTINCT p
+    	    FROM Pedido p
+    	    LEFT JOIN FETCH p.detallesPedidos d
+    	    LEFT JOIN FETCH d.plato
+    	    LEFT JOIN FETCH p.cierreCaja
+    	    WHERE p.puesto = :puesto
+    	    ORDER BY p.idPedido DESC
+    	    """)
+    	List<Pedido> obtenerHistorialConDetalles(
+    	        @Param("puesto") UnidadVenta puesto);
 
 
 }
