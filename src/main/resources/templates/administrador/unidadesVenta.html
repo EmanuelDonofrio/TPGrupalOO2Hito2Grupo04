@@ -73,8 +73,15 @@
                                 Unidad de Venta
                             </td>
 
-                            <td th:text="${u.responsable}">
-                                Responsable
+                            <td>
+                                <span th:if="${u.responsable != null}"
+                                    th:text="${u.responsable.nombre + ' ' + u.responsable.apellido}">
+                                </span>
+
+                                <span th:unless="${u.responsable != null}"
+                                    class="text-muted">
+                                    Sin responsable asignado
+                                </span>
                             </td>
 
                             <td>
@@ -141,13 +148,11 @@
 
                     <div class="d-grid gap-3">
 
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                data-dismiss="modal"
-                                onclick="seleccionarUnidadExistente()">
+                        <a th:href="@{/administrador/{id}/asignar-unidades(id=${festival.idFestival})}"
+                            class="btn btn-outline-primary">
                             <i class="bi bi-link-45deg me-1"></i>
                             Seleccionar una existente
-                        </button>
+                        </a>
 
                         <button type="button"
                                 class="btn btn-success"
