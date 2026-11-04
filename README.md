@@ -150,10 +150,41 @@ La aplicación implementa variables de entorno para evitar la exposición de cre
 - Link a los PR (entre los pr hay algunos fixes): https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pulls?q=is%3Apr+state%3Aclosed+author%3Aangelvalentinn
 
 ### Integrante: Iara Yael Aznar (@IaraAznar)
- 1. Caso de uso 1:
-      -Actor:
-      -Descripción:
-      -Link al Pull Request:
+
+**Caso de uso 1: Crear unidad de venta y asociarla a un festival**
+
+- **Actor:** Administrador.
+- **Descripción:** Permite al administrador registrar una nueva unidad de venta (Food Truck o Puesto Desarmable) desde la gestión de un festival determinado. Se registran los datos de la unidad, su responsable y las credenciales de acceso de este último. Una vez completado el registro, la unidad queda asociada automáticamente al festival seleccionado.
+- **Validaciones:** Se verifica que el festival exista, que el DNI del responsable y el nombre de usuario no estén registrados previamente y que los datos ingresados cumplan con las validaciones correspondientes. La contraseña se almacena encriptada.
+- **Link al Pull Request:** https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/29
+
+**Caso de uso 2: Asignar unidades de venta existentes a un festival**
+
+- **Actor:** Administrador.
+- **Descripción:** Permite seleccionar una o varias unidades de venta previamente registradas y asociarlas a un festival determinado, evitando tener que registrarlas nuevamente.
+- **Validaciones:** Se verifica que el festival exista, que se hayan seleccionado unidades y que todas las unidades seleccionadas sean válidas. Se evita duplicar la asociación de una misma unidad al mismo festival. Una unidad puede participar en distintos festivales.
+- **Link al Pull Request:** https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/28
+
+**Caso de uso 3: Visualizar unidades de venta por festival**
+
+- **Actor:** Administrador.
+- **Descripción:** Permite consultar las unidades de venta asociadas a un festival específico, visualizando sus datos principales, como identificador, nombre comercial y responsable asignado.
+- **Validaciones:** Se verifica que el festival solicitado exista antes de mostrar sus unidades.
+- **Link al Pull Request:** https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/4 y https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/14
+
+**Caso de uso 4: Consultar ranking de unidades de venta por festival**
+
+- **Actor:** Administrador.
+- **Descripción:** Permite consultar un ranking de las unidades de venta pertenecientes a un festival, ordenadas según su recaudación, para comparar su rendimiento económico.
+- **Validaciones:** El ranking se calcula considerando las unidades asociadas al festival seleccionado y se ordena de mayor a menor recaudación.
+- **Link al Pull Request:** https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/15
+
+**Caso de uso 5: Consultar unidades de venta con mayor canon por festival**
+
+- **Actor:** Administrador.
+- **Descripción:** Permite obtener un reporte de las unidades de venta que deben abonar los mayores montos de canon dentro de un festival determinado. El administrador puede indicar cuántas unidades desea visualizar.
+- **Validaciones:** Se verifica que el festival exista. La cantidad de unidades a mostrar se establece mediante un parámetro, con un valor predeterminado de 3.
+- **Link al Pull Request:** https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/25
 
 ### Integrante: Agustin Luengo (@luengo04)
 
