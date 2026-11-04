@@ -145,6 +145,7 @@ La aplicación implementa variables de entorno para evitar la exposición de cre
  4. Caso de uso 4: Calculo de canon. Método que devuelve el monto que tiene que pagar la unidad de venta
  5. Caso de uso 5: Reporte de recaudación. Retorna la recaudación total bruta de la unidad de venta
  6. Caso de uso 6: Alta y modificación de platos
+ 7. Caso de uso 6: Habilitación de empleados deshabilitados
 
 - Link a los PR (entre los pr hay algunos fixes): https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pulls?q=is%3Apr+state%3Aclosed+author%3Aangelvalentinn
 
