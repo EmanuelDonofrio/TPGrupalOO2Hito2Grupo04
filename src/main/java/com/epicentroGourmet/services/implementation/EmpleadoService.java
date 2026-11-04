@@ -191,7 +191,7 @@ public class EmpleadoService {
         //ENVIO DE MAIL
         emailService.enviarMail(
                 "TP_OO2_GRUPO04@gmail.com",
-                "luengo04@gmail.com",
+                "aza004aa@gmail.com",
                 "Epicentro Gourmet - Credenciales de acceso",
                 "Hola " + form.getNombre() + " " + form.getApellido() + ",\n\n"
                 + "¡Te damos la bienvenida a Epicentro Gourmet!\n\n"
