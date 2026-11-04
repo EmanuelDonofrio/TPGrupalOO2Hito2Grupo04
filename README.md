@@ -152,11 +152,72 @@ La aplicación implementa variables de entorno para evitar la exposición de cre
       -Link al Pull Request:
 
 ### Integrante: Agustin Luengo (@luengo04)
- 1. Caso de uso 1:
-      -Actor:
-      -Descripción:
-      -Link al Pull Request:
-       
+
+ 1. Caso de uso 1: Visualizar información como empleado
+    
+      -Actor: Empleado (ROLE_EMPLEADO)
+    
+      -Descripción: Inicia sesión y accede a la sección "Mi información" para consultar sus datos.
+    
+      -Validaciones: El usuario debe estar autenticado y tener un empleado asociado.
+    
+      -Link al Pull Request: https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/13
+    
+ 2. Caso de uso 2: Consultar trabajo actual e historial
+    
+      -Actor: Empleado (ROLE_EMPLEADO)
+    
+      -Descripción: Consulta la unidad de venta y festival asociadas al empleado.
+    
+      -Validaciones: El empleado debe tener una unidad de venta asignada.
+    
+      -Link al Pull Request: https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/13
+    
+ 3. Caso de uso 3: Consultar liquidación de sueldo y recibo en PDF
+    
+      -Actor: Empleado (ROLE_EMPLEADO)
+    
+      -Descripción: El empleado consulta la liquidación salarial conforme a la consigna y puede descargarlo en formato PDF.
+    
+      -Link al Pull Request: https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/13
+    
+ 4. Caso de uso 4: Crear pedidos
+    
+      -Actor: Cajero (ROLE_EMPLEADO)
+    
+      -Descripción: El cajero selecciona platos del menú con su cantidad y confirma el pedido.
+    
+      -Validaciones: Sólo el cajero puede acceder.
+    
+      -Link al Pull Request: https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/24
+    
+ 5. Caso de uso 5: Apertura y cierre de caja
+     
+      -Actor: Cajero (ROLE_EMPLEADO)
+    
+      -Descripción: El cajero puede abrir la caja de su unidad de venta para registrar ventas y cerrarla al finalizar la jornada.
+    
+      -Validaciones: Chequeo del estado de la caja.
+    
+      -Link al Pull Request: https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/26
+    
+ 6. Caso de uso 6: Consultar historial de pedidos
+
+      -Actor: Cajero (ROLE_EMPLEADO)
+     
+      -Descripción: El cajero puede consultar los pedidos realizados en su unidad de venta.
+     
+      -Link al Pull Request: https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/27
+     
+ 7. Caso de uso 7: Registrar observaciones en pedidos
+    
+      -Actor: Cajero (ROLE_EMPLEADO)
+    
+      -Descripción: Al crear un pedido, se puede realizar indicaciones extra.
+    
+      -Link al Pull Request: https://github.com/EmanuelDonofrio/TPGrupalOO2Hito2Grupo04/pull/27
+
+
     
     
 
