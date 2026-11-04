@@ -53,7 +53,8 @@ public class EmpleadoController {
     // 1. Ver su información personal, unidad y festivales
     @GetMapping("/mi-informacion")
     public ModelAndView verMiInformacion(Authentication authentication){
-        ModelAndView mav = new ModelAndView("empleado/informacion");
+        
+    	ModelAndView mav = new ModelAndView("empleado/informacion");
         User user = userRepository.findByUsername(authentication.getName());
 
         if(user != null && user.getEmpleado() != null){
